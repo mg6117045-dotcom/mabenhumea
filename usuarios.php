@@ -3,7 +3,7 @@
 // Sesionecs
 session_start();
 
-$_SESSION["username"] = "juan";
+$_SESSION["username"] = "mabenhumea";
 $_SESSION["login_time"] = time();
 
 // index.php
