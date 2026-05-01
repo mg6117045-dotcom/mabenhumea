@@ -88,6 +88,9 @@ if (!isset($_SESSION['id'])) {
     .book-card img {
       border-bottom: 2px solid rgba(255,255,255,0.3);
     }
+    a {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -102,8 +105,8 @@ if (!isset($_SESSION['id'])) {
         </a>
         <nav>
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-            <li><a class="nav-link text-white" href="#" onclick="showBooks()"><i class="bi bi-collection fw-bold fs-5 pe-2"></i>Libros</a></li>
-            <li><a class="nav-link text-white" href="#" onclick="showAddBookForm()"><i class="bi bi-plus-circle fw-bold fs-5 pe-2"></i>Agregar</a></li>
+            <li><a class="nav-link text-white" style="cursor: pointer;" onclick="showBooks(); return false;"><i class="bi bi-collection fw-bold fs-5 pe-2"></i>Libros</a></li>
+            <li><a class="nav-link text-white" style="cursor: pointer;" onclick="showAddBookForm(); return false;"><i class="bi bi-plus-circle fw-bold fs-5 pe-2"></i>Agregar</a></li>
           </ul>
         </nav>
       </div>
@@ -136,12 +139,6 @@ if (!isset($_SESSION['id'])) {
         <div>
           <h6><i class="bi bi-bookmark"></i> Categorías</h6>
           <div id="categories-list"></div>
-        </div>
-        <hr>
-        <div>
-          <button class="btn btn-sm btn-danger w-100" onclick="eliminarTodosLosLibros()">
-            <i class="bi bi-trash"></i> Eliminar todos los libros
-          </button>
         </div>
       </div>
     </aside>
@@ -193,11 +190,31 @@ if (!isset($_SESSION['id'])) {
     constructor() {
       this.libros = [];
       this.cargarDesdeLocalStorage();
-      // Si no hay libros, inicializar con datos vacíos (sin ejemplos predefinidos)
+      // Si no hay libros, cargar algunos de ejemplo
       if (this.libros.length === 0) {
-        this.libros = [];
+        this.cargarLibrosEjemplo();
         this.guardarEnLocalStorage();
       }
+    }
+
+    cargarLibrosEjemplo() {
+      this.libros = [
+        new Libro(1, "El Principito", "Antoine de Saint-Exupéry", 
+          "Un clásico de la literatura infantil que invita a reflexionar sobre la amistad y el amor.",
+          "Había una vez un principito que vivía en un asteroide... [Aquí iría el contenido completo del libro]",
+          "https://images.cdn3.buscalibre.com/fit-in/300x300/61/8e/618e227e605727fc26d7d132b1b2e6bb.jpg",
+          "Ficción"),
+        new Libro(2, "Cien años de soledad", "Gabriel García Márquez", 
+          "La historia de la familia Buendía a lo largo de siete generaciones en el pueblo ficticio de Macondo.",
+          "Muchos años después, frente al pelotón de fusilamiento...",
+          "https://images.cdn3.buscalibre.com/fit-in/300x300/be/75/be75f4a9de6bcceb7c8c26b776b658fa.jpg",
+          "Realismo mágico"),
+        new Libro(3, "1984", "George Orwell", 
+          "Una distopía que explora los peligros del totalitarismo y la vigilancia masiva.",
+          "Era un brillante día de abril y los relojes daban las trece...",
+          "https://images.cdn1.buscalibre.com/fit-in/300x300/df/61/df61beca7c0fcb48f77b4db37540e612.jpg",
+          "Ciencia ficción")
+      ];
     }
 
     guardarEnLocalStorage() {
@@ -214,11 +231,7 @@ if (!isset($_SESSION['id'])) {
           console.error("Error al cargar datos:", e);
           this.libros = [];
         }
-      } else {
-        this.libros = [];
-        this.guardarEnLocalStorage();
       }
-      this.actualizarEstadisticas();
     }
 
     agregarLibro(titulo, autor, descripcion, contenido, portada, categoria) {
@@ -228,18 +241,6 @@ if (!isset($_SESSION['id'])) {
       this.guardarEnLocalStorage();
       this.actualizarEstadisticas();
       return nuevoLibro;
-    }
-
-    eliminarLibro(id) {
-      this.libros = this.libros.filter(l => l.id !== id);
-      this.guardarEnLocalStorage();
-      this.actualizarEstadisticas();
-    }
-
-    eliminarTodos() {
-      this.libros = [];
-      this.guardarEnLocalStorage();
-      this.actualizarEstadisticas();
     }
 
     obtenerTodos() {
@@ -265,25 +266,15 @@ if (!isset($_SESSION['id'])) {
     }
   }
 
-  // Función para generar colores aleatorios pero consistentes por ID
+  // Función para generar colores consistentes por ID
   function getColorClass(id) {
     const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-7', 'color-8'];
-    return colors[id % colors.length];
+    return colors[(id - 1) % colors.length];
   }
 
   // Inicializar biblioteca
   const biblioteca = new BibliotecaVirtual();
   let modoLuz = 'off';
-
-  // Función para eliminar todos los libros
-  function eliminarTodosLosLibros() {
-    if (confirm('⚠️ ¿Estás seguro de que quieres eliminar TODOS los libros? Esta acción no se puede deshacer.')) {
-      biblioteca.eliminarTodos();
-      showBooks();
-      actualizarSidebarCategorias();
-      alert('Todos los libros han sido eliminados.');
-    }
-  }
 
   // Funciones de UI
   function showBooks() {
@@ -291,21 +282,6 @@ if (!isset($_SESSION['id'])) {
     if (!container) return;
     
     const libros = biblioteca.obtenerTodos();
-    
-    if (libros.length === 0) {
-      container.innerHTML = `
-        <div class="text-center py-5">
-          <i class="bi bi-emoji-frown" style="font-size: 4rem;"></i>
-          <h3 class="mt-3">No hay libros en tu biblioteca</h3>
-          <p class="text-muted">Haz clic en "Agregar" para añadir tu primer libro</p>
-          <button class="btn btn-primary mt-2" onclick="showAddBookForm()">
-            <i class="bi bi-plus-circle"></i> Agregar libro
-          </button>
-        </div>
-      `;
-      actualizarSidebarCategorias();
-      return;
-    }
     
     container.innerHTML = `
       <div class="row">
@@ -319,12 +295,9 @@ if (!isset($_SESSION['id'])) {
                 <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
                 <span class="badge">${escapeHtml(libro.categoria)}</span>
               </div>
-              <div class="card-footer bg-transparent d-flex justify-content-between">
+              <div class="card-footer bg-transparent">
                 <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); readBook(${libro.id})">
-                  <i class="bi bi-book"></i> Leer
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); eliminarLibro(${libro.id})">
-                  <i class="bi bi-trash"></i> Eliminar
+                  <i class="bi bi-book"></i> Leer libro
                 </button>
               </div>
             </div>
@@ -334,13 +307,6 @@ if (!isset($_SESSION['id'])) {
     `;
     
     actualizarSidebarCategorias();
-  }
-
-  function eliminarLibro(id) {
-    if (confirm('¿Estás seguro de que quieres eliminar este libro?')) {
-      biblioteca.eliminarLibro(id);
-      showBooks();
-    }
   }
 
   function escapeHtml(text) {
@@ -353,15 +319,11 @@ if (!isset($_SESSION['id'])) {
     const categorias = biblioteca.obtenerCategorias();
     const container = document.getElementById('categories-list');
     if (container) {
-      if (categorias.length === 1 && categorias[0] === 'Todas') {
-        container.innerHTML = '<small class="text-muted">No hay categorías</small>';
-      } else {
-        container.innerHTML = categorias.map(cat => `
-          <a href="#" class="d-block text-decoration-none mb-1" onclick="filtrarPorCategoria('${cat}')">
-            <i class="bi bi-tag"></i> ${cat}
-          </a>
-        `).join('');
-      }
+      container.innerHTML = categorias.map(cat => `
+        <a style="cursor: pointer; display: block; text-decoration: none; margin-bottom: 5px;" onclick="filtrarPorCategoria('${cat}'); return false;">
+          <i class="bi bi-tag"></i> ${cat}
+        </a>
+      `).join('');
     }
   }
 
@@ -369,17 +331,6 @@ if (!isset($_SESSION['id'])) {
     const libros = categoria === 'Todas' ? biblioteca.obtenerTodos() : biblioteca.obtenerPorCategoria(categoria);
     const container = document.getElementById('books-container');
     if (container) {
-      if (libros.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-5">
-            <i class="bi bi-inbox" style="font-size: 4rem;"></i>
-            <h4>No hay libros en "${categoria}"</h4>
-            <button class="btn btn-primary mt-2" onclick="showBooks()">Ver todos</button>
-          </div>
-        `;
-        return;
-      }
-      
       container.innerHTML = `
         <div class="row">
           ${libros.map(libro => `
@@ -392,12 +343,9 @@ if (!isset($_SESSION['id'])) {
                   <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
                   <span class="badge">${escapeHtml(libro.categoria)}</span>
                 </div>
-                <div class="card-footer bg-transparent d-flex justify-content-between">
+                <div class="card-footer bg-transparent">
                   <button class="btn btn-sm btn-primary" onclick="readBook(${libro.id})">
-                    <i class="bi bi-book"></i> Leer
-                  </button>
-                  <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${libro.id})">
-                    <i class="bi bi-trash"></i> Eliminar
+                    <i class="bi bi-book"></i> Leer libro
                   </button>
                 </div>
               </div>
@@ -504,18 +452,14 @@ if (!isset($_SESSION['id'])) {
     if (mode === 'on') {
       body.style.backgroundColor = '#fff9e6';
       body.style.color = '#333';
-      document.querySelectorAll('.card').forEach(c => {
-        if (!c.classList.contains('book-card')) {
-          c.style.backgroundColor = '#fffef7';
-        }
+      document.querySelectorAll('.card:not(.book-card)').forEach(c => {
+        c.style.backgroundColor = '#fffef7';
       });
     } else {
       body.style.backgroundColor = '';
       body.style.color = '';
-      document.querySelectorAll('.card').forEach(c => {
-        if (!c.classList.contains('book-card')) {
-          c.style.backgroundColor = '';
-        }
+      document.querySelectorAll('.card:not(.book-card)').forEach(c => {
+        c.style.backgroundColor = '';
       });
     }
   }
