@@ -177,7 +177,7 @@ if (!isset($_SESSION['id'])) {
         </a>
         <nav>
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-            <li><a class="nav-link text-white" href="#" onclick="showBooks()"><i class="bi bi-collection fw-bold fs-5 pe-2"></i>Libros</a></li>
+            <li><a class="nav-link text-white" href="javascript:void(0)" onclick="showBooks()">...</a></li>
             <li><a class="nav-link text-white" href="#" onclick="showAddBookForm()"><i class="bi bi-plus-circle fw-bold fs-5 pe-2"></i>Agregar</a></li>
           </ul>
         </nav>
@@ -607,13 +607,14 @@ if (!isset($_SESSION['id'])) {
   // Usamos DOMContentLoaded para asegurar que no se ejecute múltiples veces
   let inicializado = false;
   
-  function inicializarApp() {
+ function inicializarApp() {
     if (inicializado) return;
     inicializado = true;
     
     cargarModoGuardado();
-    showBooks();
-  }
+    actualizarSidebarCategorias(); // Se ejecuta una sola vez al inicio
+    showBooks();                   // Se ejecuta una sola vez al inicio
+}
   
   // Esperar a que el DOM esté completamente cargado
   if (document.readyState === 'loading') {
