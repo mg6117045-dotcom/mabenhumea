@@ -7,59 +7,35 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 ?>
+
 <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Biblioteca Virtual - Guarda tus libros</title>
+  <title>Biblioteca Virtual - Mis Libros</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
-    .book-card {
-      transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-      height: 100%;
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #212529;
+      --sidebar-bg: #f8f9fa;
     }
-    .book-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
     }
-    /* Colores dinámicos para las tarjetas */
-    .book-card.color-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-    .book-card.color-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
-    .book-card.color-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
-    .book-card.color-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; }
-    .book-card.color-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
-    .book-card.color-6 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: white; }
-    .book-card.color-7 { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; }
-    .book-card.color-8 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; }
-    
-    .book-card .card-title,
-    .book-card .card-subtitle,
-    .book-card .card-text,
-    .book-card .badge {
-      color: inherit;
+
+    /* Estilos Modo Oscuro */
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #e0e0e0;
+      --sidebar-bg: #1e1e1e;
     }
-    .book-card .card-subtitle {
-      opacity: 0.9;
-    }
-    .book-card .badge {
-      background-color: rgba(0,0,0,0.3) !important;
-    }
-    .book-card .btn-primary {
-      background-color: rgba(255,255,255,0.3);
-      border-color: rgba(255,255,255,0.5);
-      color: white;
-    }
-    .book-card .btn-primary:hover {
-      background-color: rgba(255,255,255,0.5);
-    }
-    .book-cover {
-      height: 250px;
-      object-fit: cover;
-      background-color: #f8f9fa;
-    }
+
     .sidebar {
       position: fixed;
       top: 70px;
@@ -69,28 +45,33 @@ if (!isset($_SESSION['id'])) {
       padding: 15px 0 0;
       z-index: 999;
       overflow-y: auto;
-      background-color: #f8f9fa;
+      background-color: var(--sidebar-bg);
     }
-    main {
-      margin-top: 20px;
-      margin-bottom: 40px;
-    }
-    .book-content {
-      max-height: 70vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      font-family: Georgia, serif;
-      line-height: 1.6;
-    }
-    .navbar-brand i {
-      font-size: 1.5rem;
-    }
-    .book-card img {
-      border-bottom: 2px solid rgba(255,255,255,0.3);
-    }
-    a {
+
+    .book-card {
+      transition: transform 0.2s, box-shadow 0.3s;
       cursor: pointer;
+      height: 100%;
+      border: none;
     }
+    .book-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+    
+    /* Colores dinámicos para las tarjetas */
+    .book-card.color-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .book-card.color-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+    .book-card.color-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+    .book-card.color-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; }
+    
+    .book-cover {
+      height: 250px;
+      object-fit: cover;
+      background-color: #eee;
+    }
+    
+    main { margin-top: 20px; margin-bottom: 40px; }
   </style>
 </head>
 <body>
@@ -98,15 +79,15 @@ if (!isset($_SESSION['id'])) {
 <header>
   <div class="px-3 py-2 text-bg-primary border-bottom fixed-top">
     <div class="container">
-      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+      <div class="d-flex flex-wrap align-items-center justify-content-between">
+        <a class="d-flex align-items-center my-2 my-lg-0 text-white text-decoration-none">
           <i class="bi bi-book-half fw-bold fs-3 pe-2"></i>
-          <span class="fs-4">Biblioteca Virtual</span>
+          <span class="fs-4">Mi Biblioteca</span>
         </a>
         <nav>
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-            <li><a class="nav-link text-white" style="cursor: pointer;" onclick="showBooks(); return false;"><i class="bi bi-collection fw-bold fs-5 pe-2"></i>Libros</a></li>
-            <li><a class="nav-link text-white" style="cursor: pointer;" onclick="showAddBookForm(); return false;"><i class="bi bi-plus-circle fw-bold fs-5 pe-2"></i>Agregar</a></li>
+            <li><a class="nav-link text-white" onclick="showBooks()"><i class="bi bi-collection pe-1"></i>Libros</a></li>
+            <li><a class="nav-link text-white" onclick="showAddBookForm()"><i class="bi bi-plus-circle pe-1"></i>Agregar</a></li>
           </ul>
         </nav>
       </div>
@@ -116,35 +97,23 @@ if (!isset($_SESSION['id'])) {
 
 <div class="container-fluid" style="margin-top: 70px;">
   <div class="row">
-    <!-- Sidebar -->
-    <aside class="col-8 col-sm-6 col-md-3 col-lg-3 col-xl-2 sidebar">
+    <aside class="col-md-3 col-lg-2 sidebar">
       <div class="px-3">
         <div class="mb-4">
-          <h6><i class="bi bi-lightbulb"></i> Modo luz</h6>
+          <h6><i class="bi bi-circle-half"></i> Modo Luz</h6>
           <div class="btn-group w-100" role="group">
-            <button class="btn btn-sm btn-outline-secondary" onclick="setLightMode('off')">
-              <i class="bi bi-lightbulb"></i> Apagado
-            </button>
-            <button class="btn btn-sm btn-outline-warning" onclick="setLightMode('on')">
-              <i class="bi bi-lightbulb-fill"></i> Encendido
-            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="setLightMode('off')">Apagado</button>
+            <button class="btn btn-sm btn-outline-warning" onclick="setLightMode('on')">Encendido</button>
           </div>
         </div>
         <hr>
-        <div class="mb-3">
-          <h6><i class="bi bi-info-circle"></i> Estadísticas</h6>
-          <small class="text-muted" id="stats">Cargando...</small>
-        </div>
-        <hr>
-        <div>
+        <div id="categories-list">
           <h6><i class="bi bi-bookmark"></i> Categorías</h6>
-          <div id="categories-list"></div>
         </div>
       </div>
     </aside>
 
-    <!-- Main content -->
-    <main class="col-lg-9 col-xl-10 offset-lg-3 offset-xl-2">
+    <main class="col-md-9 offset-md-3 col-lg-10 offset-lg-2">
       <div id="main-content" class="container mt-4">
         <div class="row" id="books-container"></div>
       </div>
@@ -152,69 +121,24 @@ if (!isset($_SESSION['id'])) {
   </div>
 </div>
 
-<!-- Modal para leer libro -->
-<div class="modal fade" id="readModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="modalTitle">Lectura</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div id="modalContent" class="book-content"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // Clase Libro
   class Libro {
-    constructor(id, titulo, autor, descripcion, contenido, portada, categoria = "General") {
+    constructor(id, titulo, autor, descripcion, portada, categoria = "General") {
       this.id = id;
       this.titulo = titulo;
       this.autor = autor;
       this.descripcion = descripcion;
-      this.contenido = contenido;
       this.portada = portada || "https://via.placeholder.com/200x250?text=Sin+Portada";
       this.categoria = categoria;
-      this.fechaAgregado = new Date().toISOString();
     }
   }
 
-  // Gestor de Biblioteca
   class BibliotecaVirtual {
     constructor() {
       this.libros = [];
       this.cargarDesdeLocalStorage();
-      // Si no hay libros, cargar algunos de ejemplo
-      if (this.libros.length === 0) {
-        this.cargarLibrosEjemplo();
-        this.guardarEnLocalStorage();
-      }
-    }
-
-    cargarLibrosEjemplo() {
-      this.libros = [
-        new Libro(1, "El Principito", "Antoine de Saint-Exupéry", 
-          "Un clásico de la literatura infantil que invita a reflexionar sobre la amistad y el amor.",
-          "Había una vez un principito que vivía en un asteroide... [Aquí iría el contenido completo del libro]",
-          "https://images.cdn3.buscalibre.com/fit-in/300x300/61/8e/618e227e605727fc26d7d132b1b2e6bb.jpg",
-          "Ficción"),
-        new Libro(2, "Cien años de soledad", "Gabriel García Márquez", 
-          "La historia de la familia Buendía a lo largo de siete generaciones en el pueblo ficticio de Macondo.",
-          "Muchos años después, frente al pelotón de fusilamiento...",
-          "https://images.cdn3.buscalibre.com/fit-in/300x300/be/75/be75f4a9de6bcceb7c8c26b776b658fa.jpg",
-          "Realismo mágico"),
-        new Libro(3, "1984", "George Orwell", 
-          "Una distopía que explora los peligros del totalitarismo y la vigilancia masiva.",
-          "Era un brillante día de abril y los relojes daban las trece...",
-          "https://images.cdn1.buscalibre.com/fit-in/300x300/df/61/df61beca7c0fcb48f77b4db37540e612.jpg",
-          "Ciencia ficción")
-      ];
     }
 
     guardarEnLocalStorage() {
@@ -224,249 +148,108 @@ if (!isset($_SESSION['id'])) {
     cargarDesdeLocalStorage() {
       const guardados = localStorage.getItem('biblioteca_libros');
       if (guardados) {
-        try {
-          const parsed = JSON.parse(guardados);
-          this.libros = parsed.map(l => Object.assign(new Libro(), l));
-        } catch(e) {
-          console.error("Error al cargar datos:", e);
-          this.libros = [];
-        }
+        this.libros = JSON.parse(guardados);
       }
     }
 
-    agregarLibro(titulo, autor, descripcion, contenido, portada, categoria) {
-      const nuevoId = this.libros.length > 0 ? Math.max(...this.libros.map(l => l.id)) + 1 : 1;
-      const nuevoLibro = new Libro(nuevoId, titulo, autor, descripcion, contenido, portada, categoria);
+    agregarLibro(titulo, autor, descripcion, portada, categoria) {
+      const nuevoId = Date.now();
+      const nuevoLibro = new Libro(nuevoId, titulo, autor, descripcion, portada, categoria);
       this.libros.push(nuevoLibro);
       this.guardarEnLocalStorage();
-      this.actualizarEstadisticas();
-      return nuevoLibro;
     }
 
-    obtenerTodos() {
-      return this.libros;
-    }
-
-    obtenerPorCategoria(categoria) {
-      if (categoria === 'Todas') return this.libros;
-      return this.libros.filter(l => l.categoria === categoria);
-    }
-
+    obtenerTodos() { return this.libros; }
+    
     obtenerCategorias() {
       const cats = new Set(this.libros.map(l => l.categoria));
       return ['Todas', ...Array.from(cats).sort()];
     }
-
-    actualizarEstadisticas() {
-      const stats = document.getElementById('stats');
-      if (stats) {
-        const totalContenido = this.libros.filter(l => l.contenido && l.contenido.length > 50).length;
-        stats.innerHTML = `📚 ${this.libros.length} libros<br>📖 ${totalContenido} con contenido completo<br>⭐ ${this.libros.length * 5} lecturas estimadas`;
-      }
-    }
   }
 
-  // Función para generar colores consistentes por ID
-  function getColorClass(id) {
-    const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-7', 'color-8'];
-    return colors[(id - 1) % colors.length];
-  }
-
-  // Inicializar biblioteca
   const biblioteca = new BibliotecaVirtual();
-  let modoLuz = 'off';
 
-  // Funciones de UI
+  function getColorClass(id) {
+    const colors = ['color-1', 'color-2', 'color-3', 'color-4'];
+    return colors[id % colors.length];
+  }
+
   function showBooks() {
     const container = document.getElementById('books-container');
-    if (!container) return;
-    
     const libros = biblioteca.obtenerTodos();
     
-    container.innerHTML = `
-      <div class="row">
-        ${libros.map(libro => `
-          <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card book-card ${getColorClass(libro.id)} h-100" onclick="readBook(${libro.id})">
-              <img src="${libro.portada}" class="card-img-top book-cover" alt="${libro.titulo}" onerror="this.src='https://via.placeholder.com/200x250?text=Portada+no+disponible'">
-              <div class="card-body">
-                <h5 class="card-title">${escapeHtml(libro.titulo)}</h5>
-                <h6 class="card-subtitle mb-2">${escapeHtml(libro.autor)}</h6>
-                <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
-                <span class="badge">${escapeHtml(libro.categoria)}</span>
-              </div>
-              <div class="card-footer bg-transparent">
-                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); readBook(${libro.id})">
-                  <i class="bi bi-book"></i> Leer libro
-                </button>
-              </div>
-            </div>
+    if (libros.length === 0) {
+      container.innerHTML = '<div class="text-center mt-5"><h3>No hay libros guardados.</h3><p>Haz clic en "Agregar" para empezar.</p></div>';
+      return;
+    }
+
+    container.innerHTML = libros.map(libro => `
+      <div class="col-md-4 mb-4">
+        <div class="card book-card ${getColorClass(libro.id)}">
+          <img src="${libro.portada}" class="card-img-top book-cover" alt="portada">
+          <div class="card-body">
+            <h5 class="card-title">${libro.titulo}</h5>
+            <h6 class="card-subtitle mb-2">${libro.autor}</h6>
+            <p class="card-text small">${libro.descripcion}</p>
+            <span class="badge bg-dark">${libro.categoria}</span>
           </div>
-        `).join('')}
+        </div>
       </div>
-    `;
-    
+    `).join('');
     actualizarSidebarCategorias();
   }
 
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  function showAddBookForm() {
+    document.getElementById('books-container').innerHTML = `
+      <div class="col-md-8 mx-auto">
+        <div class="card p-4 shadow-sm" style="color: #333">
+          <h4>Nuevo Libro</h4>
+          <form id="addBookForm">
+            <input type="text" class="form-control mb-2" id="titulo" placeholder="Título" required>
+            <input type="text" class="form-control mb-2" id="autor" placeholder="Autor" required>
+            <input type="text" class="form-control mb-2" id="categoria" placeholder="Categoría">
+            <input type="url" class="form-control mb-2" id="portada" placeholder="URL de imagen de portada">
+            <textarea class="form-control mb-3" id="descripcion" placeholder="Descripción breve" rows="3" required></textarea>
+            <button type="submit" class="btn btn-primary">Guardar Libro</button>
+            <button type="button" class="btn btn-secondary" onclick="showBooks()">Cancelar</button>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('addBookForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      biblioteca.agregarLibro(
+        document.getElementById('titulo').value,
+        document.getElementById('autor').value,
+        document.getElementById('descripcion').value,
+        document.getElementById('portada').value,
+        document.getElementById('categoria').value || "General"
+      );
+      showBooks();
+    });
   }
 
   function actualizarSidebarCategorias() {
     const categorias = biblioteca.obtenerCategorias();
     const container = document.getElementById('categories-list');
-    if (container) {
-      container.innerHTML = categorias.map(cat => `
-        <a style="cursor: pointer; display: block; text-decoration: none; margin-bottom: 5px;" onclick="filtrarPorCategoria('${cat}'); return false;">
-          <i class="bi bi-tag"></i> ${cat}
-        </a>
-      `).join('');
-    }
-  }
-
-  function filtrarPorCategoria(categoria) {
-    const libros = categoria === 'Todas' ? biblioteca.obtenerTodos() : biblioteca.obtenerPorCategoria(categoria);
-    const container = document.getElementById('books-container');
-    if (container) {
-      container.innerHTML = `
-        <div class="row">
-          ${libros.map(libro => `
-            <div class="col-md-6 col-lg-4 mb-4">
-              <div class="card book-card ${getColorClass(libro.id)} h-100">
-                <img src="${libro.portada}" class="card-img-top book-cover" alt="${libro.titulo}" onerror="this.src='https://via.placeholder.com/200x250?text=Portada+no+disponible'">
-                <div class="card-body">
-                  <h5 class="card-title">${escapeHtml(libro.titulo)}</h5>
-                  <h6 class="card-subtitle mb-2">${escapeHtml(libro.autor)}</h6>
-                  <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
-                  <span class="badge">${escapeHtml(libro.categoria)}</span>
-                </div>
-                <div class="card-footer bg-transparent">
-                  <button class="btn btn-sm btn-primary" onclick="readBook(${libro.id})">
-                    <i class="bi bi-book"></i> Leer libro
-                  </button>
-                </div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-  }
-
-  function showAddBookForm() {
-    const container = document.getElementById('books-container');
-    container.innerHTML = `
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <div class="card">
-            <div class="card-header bg-primary text-white">
-              <h4><i class="bi bi-plus-circle"></i> Agregar nuevo libro</h4>
-            </div>
-            <div class="card-body">
-              <form id="addBookForm">
-                <div class="mb-3">
-                  <label class="form-label">Título *</label>
-                  <input type="text" class="form-control" id="titulo" required>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Autor *</label>
-                  <input type="text" class="form-control" id="autor" required>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Categoría</label>
-                  <input type="text" class="form-control" id="categoria" placeholder="Ej: Novela, Poesía, Ciencia...">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">URL de portada (opcional)</label>
-                  <input type="url" class="form-control" id="portada" placeholder="https://ejemplo.com/imagen.jpg">
-                  <small class="text-muted">Deja vacío para usar imagen por defecto</small>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Descripción breve *</label>
-                  <textarea class="form-control" id="descripcion" rows="2" required></textarea>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Contenido del libro *</label>
-                  <textarea class="form-control" id="contenido" rows="8" placeholder="Escribe aquí el texto completo del libro..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Guardar libro</button>
-                <button type="button" class="btn btn-secondary" onclick="showBooks()"><i class="bi bi-arrow-left"></i> Cancelar</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    document.getElementById('addBookForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const titulo = document.getElementById('titulo').value;
-      const autor = document.getElementById('autor').value;
-      const descripcion = document.getElementById('descripcion').value;
-      const contenido = document.getElementById('contenido').value;
-      const portada = document.getElementById('portada').value || "https://via.placeholder.com/200x250?text=Nuevo+Libro";
-      const categoria = document.getElementById('categoria').value || "General";
-      
-      if (!titulo || !autor || !descripcion || !contenido) {
-        alert('Por favor completa todos los campos obligatorios (*)');
-        return;
-      }
-      
-      biblioteca.agregarLibro(titulo, autor, descripcion, contenido, portada, categoria);
-      alert(`✅ Libro "${titulo}" agregado correctamente`);
-      showBooks();
-    });
-  }
-
-  function readBook(id) {
-    const libro = biblioteca.libros.find(l => l.id === id);
-    if (!libro) return;
-    
-    document.getElementById('modalTitle').innerHTML = `<i class="bi bi-book"></i> ${escapeHtml(libro.titulo)} - ${escapeHtml(libro.autor)}`;
-    document.getElementById('modalContent').innerHTML = `
-      <div class="mb-3">
-        <div class="alert alert-info">
-          <i class="bi bi-info-circle"></i> <strong>Descripción:</strong><br>
-          ${escapeHtml(libro.descripcion)}
-        </div>
-        <div class="alert alert-secondary">
-          <i class="bi bi-tag"></i> <strong>Categoría:</strong> ${escapeHtml(libro.categoria)}<br>
-          <i class="bi bi-calendar"></i> <strong>Agregado:</strong> ${new Date(libro.fechaAgregado).toLocaleDateString()}
-        </div>
-        <hr>
-        <h5><i class="bi bi-journal-bookmark-fill"></i> Contenido:</h5>
-        <div class="p-3" style="white-space: pre-wrap;">${escapeHtml(libro.contenido || "Este libro aún no tiene contenido disponible.")}</div>
-      </div>
-    `;
-    
-    const modal = new bootstrap.Modal(document.getElementById('readModal'));
-    modal.show();
+    container.innerHTML = '<h6><i class="bi bi-bookmark"></i> Categorías</h6>' + categorias.map(cat => `
+      <a class="d-block mb-1 text-decoration-none" style="cursor:pointer" onclick="filtrar('${cat}')">
+        <i class="bi bi-tag small"></i> ${cat}
+      </a>
+    `).join('');
   }
 
   function setLightMode(mode) {
-    modoLuz = mode;
-    const body = document.body;
     if (mode === 'on') {
-      body.style.backgroundColor = '#fff9e6';
-      body.style.color = '#333';
-      document.querySelectorAll('.card:not(.book-card)').forEach(c => {
-        c.style.backgroundColor = '#fffef7';
-      });
+      document.body.classList.remove('dark-mode');
     } else {
-      body.style.backgroundColor = '';
-      body.style.color = '';
-      document.querySelectorAll('.card:not(.book-card)').forEach(c => {
-        c.style.backgroundColor = '';
-      });
+      document.body.classList.add('dark-mode');
     }
   }
 
-  // Inicializar vista
+  // Carga inicial
   showBooks();
 </script>
-
 </body>
 </html>
