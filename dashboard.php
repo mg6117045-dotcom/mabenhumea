@@ -29,7 +29,6 @@ if (!isset($_SESSION['id'])) {
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Estilos Modo Oscuro */
     body.dark-mode {
       --bg-color: #121212;
       --text-color: #e0e0e0;
@@ -59,7 +58,6 @@ if (!isset($_SESSION['id'])) {
       box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
     
-    /* Colores dinámicos para las tarjetas */
     .book-card.color-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
     .book-card.color-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
     .book-card.color-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
@@ -80,14 +78,14 @@ if (!isset($_SESSION['id'])) {
   <div class="px-3 py-2 text-bg-primary border-bottom fixed-top">
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-between">
-        <a class="d-flex align-items-center my-2 my-lg-0 text-white text-decoration-none">
+        <a class="d-flex align-items-center my-2 my-lg-0 text-white text-decoration-none" style="cursor:pointer" onclick="showBooks()">
           <i class="bi bi-book-half fw-bold fs-3 pe-2"></i>
           <span class="fs-4">Mi Biblioteca</span>
         </a>
         <nav>
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-            <li><a class="nav-link text-white" onclick="showBooks()"><i class="bi bi-collection pe-1"></i>Libros</a></li>
-            <li><a class="nav-link text-white" onclick="showAddBookForm()"><i class="bi bi-plus-circle pe-1"></i>Agregar</a></li>
+            <li><a class="nav-link text-white" style="cursor:pointer" onclick="showBooks()"><i class="bi bi-collection pe-1"></i>Libros</a></li>
+            <li><a class="nav-link text-white" style="cursor:pointer" onclick="showAddBookForm()"><i class="bi bi-plus-circle pe-1"></i>Agregar</a></li>
           </ul>
         </nav>
       </div>
@@ -100,16 +98,16 @@ if (!isset($_SESSION['id'])) {
     <aside class="col-md-3 col-lg-2 sidebar">
       <div class="px-3">
         <div class="mb-4">
-          <h6><i class="bi bi-circle-half"></i> Modo Luz</h6>
+          <h6><i class="bi bi-circle-half"></i> Tema </h6>
           <div class="btn-group w-100" role="group">
-            <button class="btn btn-sm btn-outline-secondary" onclick="setLightMode('off')">Apagado</button>
-            <button class="btn btn-sm btn-outline-warning" onclick="setLightMode('on')">Encendido</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="setLightMode('off')">Oscuro</button>
+            <button class="btn btn-sm btn-outline-warning" onclick="setLightMode('on')">Luz</button>
           </div>
         </div>
         <hr>
         <div id="categories-list">
           <h6><i class="bi bi-bookmark"></i> Categorías</h6>
-        </div>
+          </div>
       </div>
     </aside>
 
@@ -147,9 +145,8 @@ if (!isset($_SESSION['id'])) {
 
     cargarDesdeLocalStorage() {
       const guardados = localStorage.getItem('biblioteca_libros');
-      if (guardados) {
-        this.libros = JSON.parse(guardados);
-      }
+      // Si existen datos, los carga; si no, deja el array vacío.
+      this.libros = guardados ? JSON.parse(guardados) : [];
     }
 
     agregarLibro(titulo, autor, descripcion, portada, categoria) {
@@ -174,29 +171,42 @@ if (!isset($_SESSION['id'])) {
     return colors[id % colors.length];
   }
 
-  function showBooks() {
+  // Función principal para renderizar libros (opcionalmente filtrados)
+  function renderBooks(listaLibros) {
     const container = document.getElementById('books-container');
-    const libros = biblioteca.obtenerTodos();
     
-    if (libros.length === 0) {
-      container.innerHTML = '<div class="text-center mt-5"><h3>No hay libros guardados.</h3><p>Haz clic en "Agregar" para empezar.</p></div>';
-      return;
-    }
-
-    container.innerHTML = libros.map(libro => `
-      <div class="col-md-4 mb-4">
-        <div class="card book-card ${getColorClass(libro.id)}">
-          <img src="${libro.portada}" class="card-img-top book-cover" alt="portada">
-          <div class="card-body">
-            <h5 class="card-title">${libro.titulo}</h5>
-            <h6 class="card-subtitle mb-2">${libro.autor}</h6>
-            <p class="card-text small">${libro.descripcion}</p>
-            <span class="badge bg-dark">${libro.categoria}</span>
+    if (listaLibros.length === 0) {
+      container.innerHTML = '<div class="text-center mt-5"><h3>No hay libros en esta sección.</h3><p>Haz clic en "Agregar" para empezar.</p></div>';
+    } else {
+      container.innerHTML = listaLibros.map(libro => `
+        <div class="col-md-4 mb-4">
+          <div class="card book-card ${getColorClass(libro.id)}">
+            <img src="${libro.portada}" class="card-img-top book-cover" alt="portada">
+            <div class="card-body">
+              <h5 class="card-title">${libro.titulo}</h5>
+              <h6 class="card-subtitle mb-2">${libro.autor}</h6>
+              <p class="card-text small">${libro.descripcion}</p>
+              <span class="badge bg-dark">${libro.categoria}</span>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `).join('');
+    }
     actualizarSidebarCategorias();
+  }
+
+  function showBooks() {
+    renderBooks(biblioteca.obtenerTodos());
+  }
+
+  // --- SOLUCIÓN AL PROBLEMA DE FILTRADO ---
+  function filtrar(cat) {
+    if (cat === 'Todas') {
+      showBooks();
+    } else {
+      const filtrados = biblioteca.obtenerTodos().filter(l => l.categoria === cat);
+      renderBooks(filtrados);
+    }
   }
 
   function showAddBookForm() {
@@ -207,7 +217,7 @@ if (!isset($_SESSION['id'])) {
           <form id="addBookForm">
             <input type="text" class="form-control mb-2" id="titulo" placeholder="Título" required>
             <input type="text" class="form-control mb-2" id="autor" placeholder="Autor" required>
-            <input type="text" class="form-control mb-2" id="categoria" placeholder="Categoría">
+            <input type="text" class="form-control mb-2" id="categoria" placeholder="Categoría (ej: Fantasía, Programación)">
             <input type="url" class="form-control mb-2" id="portada" placeholder="URL de imagen de portada">
             <textarea class="form-control mb-3" id="descripcion" placeholder="Descripción breve" rows="3" required></textarea>
             <button type="submit" class="btn btn-primary">Guardar Libro</button>
@@ -221,7 +231,7 @@ if (!isset($_SESSION['id'])) {
       e.preventDefault();
       biblioteca.agregarLibro(
         document.getElementById('titulo').value,
-        document.getElementById('autor').value,
+        document.getElementById( 'autor').value,
         document.getElementById('descripcion').value,
         document.getElementById('portada').value,
         document.getElementById('categoria').value || "General"
@@ -233,8 +243,15 @@ if (!isset($_SESSION['id'])) {
   function actualizarSidebarCategorias() {
     const categorias = biblioteca.obtenerCategorias();
     const container = document.getElementById('categories-list');
+    
+    // Solo mostramos categorías si hay libros
+    if(biblioteca.obtenerTodos().length === 0) {
+        container.innerHTML = '<h6><i class="bi bi-bookmark"></i> Categorías</h6><p class="small text-muted ps-2">Sin categorías</p>';
+        return;
+    }
+
     container.innerHTML = '<h6><i class="bi bi-bookmark"></i> Categorías</h6>' + categorias.map(cat => `
-      <a class="d-block mb-1 text-decoration-none" style="cursor:pointer" onclick="filtrar('${cat}')">
+      <a class="d-block mb-1 text-decoration-none text-capitalize" style="cursor:pointer; color: inherit;" onclick="filtrar('${cat}')">
         <i class="bi bi-tag small"></i> ${cat}
       </a>
     `).join('');
@@ -248,7 +265,7 @@ if (!isset($_SESSION['id'])) {
     }
   }
 
-  // Carga inicial
+  // Iniciar la aplicación
   showBooks();
 </script>
 </body>
