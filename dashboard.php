@@ -12,18 +12,48 @@ if (!isset($_SESSION['id'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Biblioteca Virtual</title>
+  <title>Biblioteca Virtual - Guarda tus libros</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
     .book-card {
-      transition: transform 0.2s;
+      transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
       cursor: pointer;
       height: 100%;
     }
     .book-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    /* Colores dinámicos para las tarjetas */
+    .book-card.color-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .book-card.color-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+    .book-card.color-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+    .book-card.color-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; }
+    .book-card.color-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+    .book-card.color-6 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: white; }
+    .book-card.color-7 { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; }
+    .book-card.color-8 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; }
+    
+    .book-card .card-title,
+    .book-card .card-subtitle,
+    .book-card .card-text,
+    .book-card .badge {
+      color: inherit;
+    }
+    .book-card .card-subtitle {
+      opacity: 0.9;
+    }
+    .book-card .badge {
+      background-color: rgba(0,0,0,0.3) !important;
+    }
+    .book-card .btn-primary {
+      background-color: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+      color: white;
+    }
+    .book-card .btn-primary:hover {
+      background-color: rgba(255,255,255,0.5);
     }
     .book-cover {
       height: 250px;
@@ -54,6 +84,9 @@ if (!isset($_SESSION['id'])) {
     }
     .navbar-brand i {
       font-size: 1.5rem;
+    }
+    .book-card img {
+      border-bottom: 2px solid rgba(255,255,255,0.3);
     }
   </style>
 </head>
@@ -104,13 +137,18 @@ if (!isset($_SESSION['id'])) {
           <h6><i class="bi bi-bookmark"></i> Categorías</h6>
           <div id="categories-list"></div>
         </div>
+        <hr>
+        <div>
+          <button class="btn btn-sm btn-danger w-100" onclick="eliminarTodosLosLibros()">
+            <i class="bi bi-trash"></i> Eliminar todos los libros
+          </button>
+        </div>
       </div>
     </aside>
 
     <!-- Main content -->
     <main class="col-lg-9 col-xl-10 offset-lg-3 offset-xl-2">
       <div id="main-content" class="container mt-4">
-        <!-- Aquí se mostrarán los libros o el formulario -->
         <div class="row" id="books-container"></div>
       </div>
     </main>
@@ -143,7 +181,7 @@ if (!isset($_SESSION['id'])) {
       this.titulo = titulo;
       this.autor = autor;
       this.descripcion = descripcion;
-      this.contenido = contenido; // Texto completo del libro
+      this.contenido = contenido;
       this.portada = portada || "https://via.placeholder.com/200x250?text=Sin+Portada";
       this.categoria = categoria;
       this.fechaAgregado = new Date().toISOString();
@@ -154,29 +192,12 @@ if (!isset($_SESSION['id'])) {
   class BibliotecaVirtual {
     constructor() {
       this.libros = [];
-      this.cargarLibrosIniciales();
       this.cargarDesdeLocalStorage();
-    }
-
-    cargarLibrosIniciales() {
-      const librosIniciales = [
-        new Libro(1, "El Principito", "Antoine de Saint-Exupéry", 
-          "Un clásico de la literatura infantil que invita a reflexionar sobre la amistad y el amor.",
-          "Había una vez un principito que vivía en un asteroide... [Aquí iría el contenido completo del libro]",
-          "https://images.cdn3.buscalibre.com/fit-in/300x300/61/8e/618e227e605727fc26d7d132b1b2e6bb.jpg",
-          "Ficción"),
-        new Libro(2, "Cien años de soledad", "Gabriel García Márquez", 
-          "La historia de la familia Buendía a lo largo de siete generaciones en el pueblo ficticio de Macondo.",
-          "Muchos años después, frente al pelotón de fusilamiento...",
-          "https://images.cdn3.buscalibre.com/fit-in/300x300/be/75/be75f4a9de6bcceb7c8c26b776b658fa.jpg",
-          "Realismo mágico"),
-        new Libro(3, "1984", "George Orwell", 
-          "Una distopía que explora los peligros del totalitarismo y la vigilancia masiva.",
-          "Era un brillante día de abril y los relojes daban las trece...",
-          "https://images.cdn1.buscalibre.com/fit-in/300x300/df/61/df61beca7c0fcb48f77b4db37540e612.jpg",
-          "Ciencia ficción")
-      ];
-      this.libros = librosIniciales;
+      // Si no hay libros, inicializar con datos vacíos (sin ejemplos predefinidos)
+      if (this.libros.length === 0) {
+        this.libros = [];
+        this.guardarEnLocalStorage();
+      }
     }
 
     guardarEnLocalStorage() {
@@ -186,30 +207,39 @@ if (!isset($_SESSION['id'])) {
     cargarDesdeLocalStorage() {
       const guardados = localStorage.getItem('biblioteca_libros');
       if (guardados) {
-        const parsed = JSON.parse(guardados);
-        this.libros = parsed.map(l => Object.assign(new Libro(), l));
-        this.asignarIds();
+        try {
+          const parsed = JSON.parse(guardados);
+          this.libros = parsed.map(l => Object.assign(new Libro(), l));
+        } catch(e) {
+          console.error("Error al cargar datos:", e);
+          this.libros = [];
+        }
       } else {
+        this.libros = [];
         this.guardarEnLocalStorage();
       }
       this.actualizarEstadisticas();
     }
 
-    asignarIds() {
-      let maxId = 0;
-      this.libros.forEach(libro => {
-        if (libro.id > maxId) maxId = libro.id;
-      });
-      this.proximoId = maxId + 1;
-    }
-
     agregarLibro(titulo, autor, descripcion, contenido, portada, categoria) {
-      const nuevoId = this.libros.length > 0 ? Math.max(...this.libros.map(l => l.id)) + 1 : 4;
+      const nuevoId = this.libros.length > 0 ? Math.max(...this.libros.map(l => l.id)) + 1 : 1;
       const nuevoLibro = new Libro(nuevoId, titulo, autor, descripcion, contenido, portada, categoria);
       this.libros.push(nuevoLibro);
       this.guardarEnLocalStorage();
       this.actualizarEstadisticas();
       return nuevoLibro;
+    }
+
+    eliminarLibro(id) {
+      this.libros = this.libros.filter(l => l.id !== id);
+      this.guardarEnLocalStorage();
+      this.actualizarEstadisticas();
+    }
+
+    eliminarTodos() {
+      this.libros = [];
+      this.guardarEnLocalStorage();
+      this.actualizarEstadisticas();
     }
 
     obtenerTodos() {
@@ -229,14 +259,31 @@ if (!isset($_SESSION['id'])) {
     actualizarEstadisticas() {
       const stats = document.getElementById('stats');
       if (stats) {
-        stats.innerHTML = `📚 ${this.libros.length} libros<br>📖 ${this.libros.filter(l => l.contenido && l.contenido.length > 50).length} con contenido<br>⭐ ${Math.floor(Math.random() * 100)} lecturas totales`;
+        const totalContenido = this.libros.filter(l => l.contenido && l.contenido.length > 50).length;
+        stats.innerHTML = `📚 ${this.libros.length} libros<br>📖 ${totalContenido} con contenido completo<br>⭐ ${this.libros.length * 5} lecturas estimadas`;
       }
     }
   }
 
+  // Función para generar colores aleatorios pero consistentes por ID
+  function getColorClass(id) {
+    const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-7', 'color-8'];
+    return colors[id % colors.length];
+  }
+
   // Inicializar biblioteca
   const biblioteca = new BibliotecaVirtual();
-  let modoLuz = 'off'; // off = normal, on = fondo claro
+  let modoLuz = 'off';
+
+  // Función para eliminar todos los libros
+  function eliminarTodosLosLibros() {
+    if (confirm('⚠️ ¿Estás seguro de que quieres eliminar TODOS los libros? Esta acción no se puede deshacer.')) {
+      biblioteca.eliminarTodos();
+      showBooks();
+      actualizarSidebarCategorias();
+      alert('Todos los libros han sido eliminados.');
+    }
+  }
 
   // Funciones de UI
   function showBooks() {
@@ -244,21 +291,40 @@ if (!isset($_SESSION['id'])) {
     if (!container) return;
     
     const libros = biblioteca.obtenerTodos();
+    
+    if (libros.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <i class="bi bi-emoji-frown" style="font-size: 4rem;"></i>
+          <h3 class="mt-3">No hay libros en tu biblioteca</h3>
+          <p class="text-muted">Haz clic en "Agregar" para añadir tu primer libro</p>
+          <button class="btn btn-primary mt-2" onclick="showAddBookForm()">
+            <i class="bi bi-plus-circle"></i> Agregar libro
+          </button>
+        </div>
+      `;
+      actualizarSidebarCategorias();
+      return;
+    }
+    
     container.innerHTML = `
       <div class="row">
         ${libros.map(libro => `
           <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card book-card h-100" onclick="readBook(${libro.id})">
+            <div class="card book-card ${getColorClass(libro.id)} h-100" onclick="readBook(${libro.id})">
               <img src="${libro.portada}" class="card-img-top book-cover" alt="${libro.titulo}" onerror="this.src='https://via.placeholder.com/200x250?text=Portada+no+disponible'">
               <div class="card-body">
-                <h5 class="card-title">${libro.titulo}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">${libro.autor}</h6>
-                <p class="card-text">${libro.descripcion.substring(0, 100)}${libro.descripcion.length > 100 ? '...' : ''}</p>
-                <span class="badge bg-secondary">${libro.categoria}</span>
+                <h5 class="card-title">${escapeHtml(libro.titulo)}</h5>
+                <h6 class="card-subtitle mb-2">${escapeHtml(libro.autor)}</h6>
+                <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
+                <span class="badge">${escapeHtml(libro.categoria)}</span>
               </div>
-              <div class="card-footer bg-transparent">
+              <div class="card-footer bg-transparent d-flex justify-content-between">
                 <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); readBook(${libro.id})">
                   <i class="bi bi-book"></i> Leer
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); eliminarLibro(${libro.id})">
+                  <i class="bi bi-trash"></i> Eliminar
                 </button>
               </div>
             </div>
@@ -267,19 +333,35 @@ if (!isset($_SESSION['id'])) {
       </div>
     `;
     
-    // Actualizar sidebar con categorías
     actualizarSidebarCategorias();
+  }
+
+  function eliminarLibro(id) {
+    if (confirm('¿Estás seguro de que quieres eliminar este libro?')) {
+      biblioteca.eliminarLibro(id);
+      showBooks();
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   function actualizarSidebarCategorias() {
     const categorias = biblioteca.obtenerCategorias();
     const container = document.getElementById('categories-list');
     if (container) {
-      container.innerHTML = categorias.map(cat => `
-        <a href="#" class="d-block text-decoration-none mb-1" onclick="filtrarPorCategoria('${cat}')">
-          <i class="bi bi-tag"></i> ${cat}
-        </a>
-      `).join('');
+      if (categorias.length === 1 && categorias[0] === 'Todas') {
+        container.innerHTML = '<small class="text-muted">No hay categorías</small>';
+      } else {
+        container.innerHTML = categorias.map(cat => `
+          <a href="#" class="d-block text-decoration-none mb-1" onclick="filtrarPorCategoria('${cat}')">
+            <i class="bi bi-tag"></i> ${cat}
+          </a>
+        `).join('');
+      }
     }
   }
 
@@ -287,21 +369,35 @@ if (!isset($_SESSION['id'])) {
     const libros = categoria === 'Todas' ? biblioteca.obtenerTodos() : biblioteca.obtenerPorCategoria(categoria);
     const container = document.getElementById('books-container');
     if (container) {
+      if (libros.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 4rem;"></i>
+            <h4>No hay libros en "${categoria}"</h4>
+            <button class="btn btn-primary mt-2" onclick="showBooks()">Ver todos</button>
+          </div>
+        `;
+        return;
+      }
+      
       container.innerHTML = `
         <div class="row">
           ${libros.map(libro => `
             <div class="col-md-6 col-lg-4 mb-4">
-              <div class="card book-card h-100">
+              <div class="card book-card ${getColorClass(libro.id)} h-100">
                 <img src="${libro.portada}" class="card-img-top book-cover" alt="${libro.titulo}" onerror="this.src='https://via.placeholder.com/200x250?text=Portada+no+disponible'">
                 <div class="card-body">
-                  <h5 class="card-title">${libro.titulo}</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">${libro.autor}</h6>
-                  <p class="card-text">${libro.descripcion.substring(0, 100)}${libro.descripcion.length > 100 ? '...' : ''}</p>
-                  <span class="badge bg-secondary">${libro.categoria}</span>
+                  <h5 class="card-title">${escapeHtml(libro.titulo)}</h5>
+                  <h6 class="card-subtitle mb-2">${escapeHtml(libro.autor)}</h6>
+                  <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
+                  <span class="badge">${escapeHtml(libro.categoria)}</span>
                 </div>
-                <div class="card-footer">
+                <div class="card-footer bg-transparent d-flex justify-content-between">
                   <button class="btn btn-sm btn-primary" onclick="readBook(${libro.id})">
                     <i class="bi bi-book"></i> Leer
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${libro.id})">
+                    <i class="bi bi-trash"></i> Eliminar
                   </button>
                 </div>
               </div>
@@ -338,6 +434,7 @@ if (!isset($_SESSION['id'])) {
                 <div class="mb-3">
                   <label class="form-label">URL de portada (opcional)</label>
                   <input type="url" class="form-control" id="portada" placeholder="https://ejemplo.com/imagen.jpg">
+                  <small class="text-muted">Deja vacío para usar imagen por defecto</small>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Descripción breve *</label>
@@ -365,8 +462,13 @@ if (!isset($_SESSION['id'])) {
       const portada = document.getElementById('portada').value || "https://via.placeholder.com/200x250?text=Nuevo+Libro";
       const categoria = document.getElementById('categoria').value || "General";
       
+      if (!titulo || !autor || !descripcion || !contenido) {
+        alert('Por favor completa todos los campos obligatorios (*)');
+        return;
+      }
+      
       biblioteca.agregarLibro(titulo, autor, descripcion, contenido, portada, categoria);
-      alert(`📘 Libro "${titulo}" agregado correctamente`);
+      alert(`✅ Libro "${titulo}" agregado correctamente`);
       showBooks();
     });
   }
@@ -375,15 +477,20 @@ if (!isset($_SESSION['id'])) {
     const libro = biblioteca.libros.find(l => l.id === id);
     if (!libro) return;
     
-    document.getElementById('modalTitle').innerHTML = `<i class="bi bi-book"></i> ${libro.titulo} - ${libro.autor}`;
+    document.getElementById('modalTitle').innerHTML = `<i class="bi bi-book"></i> ${escapeHtml(libro.titulo)} - ${escapeHtml(libro.autor)}`;
     document.getElementById('modalContent').innerHTML = `
       <div class="mb-3">
         <div class="alert alert-info">
-          <i class="bi bi-info-circle"></i> ${libro.descripcion}
+          <i class="bi bi-info-circle"></i> <strong>Descripción:</strong><br>
+          ${escapeHtml(libro.descripcion)}
+        </div>
+        <div class="alert alert-secondary">
+          <i class="bi bi-tag"></i> <strong>Categoría:</strong> ${escapeHtml(libro.categoria)}<br>
+          <i class="bi bi-calendar"></i> <strong>Agregado:</strong> ${new Date(libro.fechaAgregado).toLocaleDateString()}
         </div>
         <hr>
-        <h5>Contenido:</h5>
-        <p>${libro.contenido || "Este libro aún no tiene contenido disponible."}</p>
+        <h5><i class="bi bi-journal-bookmark-fill"></i> Contenido:</h5>
+        <div class="p-3" style="white-space: pre-wrap;">${escapeHtml(libro.contenido || "Este libro aún no tiene contenido disponible.")}</div>
       </div>
     `;
     
@@ -397,11 +504,19 @@ if (!isset($_SESSION['id'])) {
     if (mode === 'on') {
       body.style.backgroundColor = '#fff9e6';
       body.style.color = '#333';
-      document.querySelectorAll('.card').forEach(c => c.style.backgroundColor = '#fffef7');
+      document.querySelectorAll('.card').forEach(c => {
+        if (!c.classList.contains('book-card')) {
+          c.style.backgroundColor = '#fffef7';
+        }
+      });
     } else {
       body.style.backgroundColor = '';
       body.style.color = '';
-      document.querySelectorAll('.card').forEach(c => c.style.backgroundColor = '');
+      document.querySelectorAll('.card').forEach(c => {
+        if (!c.classList.contains('book-card')) {
+          c.style.backgroundColor = '';
+        }
+      });
     }
   }
 
@@ -410,4 +525,4 @@ if (!isset($_SESSION['id'])) {
 </script>
 
 </body>
-</html>S
+</html>
