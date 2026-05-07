@@ -418,12 +418,12 @@ class BibliotecaVirtual {
     actualizarSidebarCategorias();
   }
 
-  function eliminarLibro(id) {
-    if (confirm('¿Estás seguro de que quieres eliminar este libro?')) {
-      biblioteca.eliminarLibro(id);
-      showBooks();
-    }
-  }
+// ✅ DESPUÉS - sin confirm doble
+function eliminarLibro(id) {
+  biblioteca.eliminarLibro(id); // el confirm ya está dentro de eliminarLibro()
+}
+
+
 
   function escapeHtml(text) {
     const div = document.createElement('div');
@@ -540,27 +540,34 @@ class BibliotecaVirtual {
     const newForm = form.cloneNode(true);
     form.parentNode.replaceChild(newForm, form);
     
-    newForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const titulo = document.getElementById('titulo').value;
-      const autor = document.getElementById('autor').value;
-      const descripcion = document.getElementById('descripcion').value;
-      const contenido = document.getElementById('contenido').value;
-      const portada = document.getElementById('portada').value || "https://via.placeholder.com/200x250?text=Nuevo+Libro";
-      const categoria = document.getElementById('categoria').value || "General";
-      
-      if (!titulo || !autor || !descripcion || !contenido) {
-        alert('Por favor completa todos los campos obligatorios (*)');
-        return;
-      }
-      
-      biblioteca.agregarLibro(titulo, autor, descripcion, contenido, portada, categoria);
-      alert(`✅ Libro "${titulo}" agregado correctamente`);
-      showBooks();
-    });
+// ✅ DESPUÉS - la función submit debe ser async
+newForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const titulo = document.getElementById('titulo').value;
+  const autor = document.getElementById('autor').value;
+  const descripcion = document.getElementById('descripcion').value;
+  const contenido = document.getElementById('contenido').value;
+  const portada = document.getElementById('portada').value || "https://via.placeholder.com/200x250?text=Nuevo+Libro";
+  const categoria = document.getElementById('categoria').value || "General";
+  
+  if (!titulo || !autor || !descripcion || !contenido) {
+    alert('Por favor completa todos los campos obligatorios (*)');
+    return;
+  }
+  
+  const exito = await biblioteca.agregarLibro(titulo, autor, descripcion, contenido, portada, categoria);
+  
+  if (exito) {
+    alert(`✅ Libro "${titulo}" agregado correctamente`);
+    showBooks();
+  } else {
+    alert('❌ Error al guardar el libro. Revisa la consola.');
+  }
+});
   }
 
   function readBook(id) {
+    
     const libro = biblioteca.libros.find(l => l.id === id);
     if (!libro) return;
     
