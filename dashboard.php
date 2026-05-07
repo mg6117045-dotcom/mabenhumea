@@ -263,81 +263,74 @@ if (!isset($_SESSION['id'])) {
   }
 
   // Gestor de Biblioteca
-  class BibliotecaVirtual {
-    constructor() {
-      this.libros = [];
-      this.cargarDesdeLocalStorage();
-      // Si no hay libros, inicializar con datos vacíos (sin ejemplos predefinidos)
-      if (this.libros.length === 0) {
-        this.libros = [];
-        this.guardarEnLocalStorage();
-      }
-    }
+class BibliotecaVirtual {
+  constructor() {
+    this.libros = [];
+    // Iniciamos la carga desde el servidor (BD) en lugar de LocalStorage
+    this.cargarDesdeServidor();
+  }
 
-    guardarEnLocalStorage() {
-      localStorage.setItem('biblioteca_libros', JSON.stringify(this.libros));
-    }
+  // --- FUNCIONES NUEVAS (CONEXIÓN A BD) ---
 
-    cargarDesdeLocalStorage() {
-      const guardados = localStorage.getItem('biblioteca_libros');
-      if (guardados) {
-        try {
-          const parsed = JSON.parse(guardados);
-          this.libros = parsed.map(l => Object.assign(new Libro(), l));
-        } catch(e) {
-          console.error("Error al cargar datos:", e);
-          this.libros = [];
-        }
-      } else {
-        this.libros = [];
-        this.guardarEnLocalStorage();
-      }
+  async cargarDesdeServidor() {
+    try {
+      const respuesta = await fetch('api_libros.php');
+      this.libros = await respuesta.json();
+      showBooks(); 
       this.actualizarEstadisticas();
-    }
-
-    agregarLibro(titulo, autor, descripcion, contenido, portada, categoria) {
-      const nuevoId = this.libros.length > 0 ? Math.max(...this.libros.map(l => l.id)) + 1 : 1;
-      const nuevoLibro = new Libro(nuevoId, titulo, autor, descripcion, contenido, portada, categoria);
-      this.libros.push(nuevoLibro);
-      this.guardarEnLocalStorage();
-      this.actualizarEstadisticas();
-      return nuevoLibro;
-    }
-
-    eliminarLibro(id) {
-      this.libros = this.libros.filter(l => l.id !== id);
-      this.guardarEnLocalStorage();
-      this.actualizarEstadisticas();
-    }
-
-    eliminarTodos() {
-      this.libros = [];
-      this.guardarEnLocalStorage();
-      this.actualizarEstadisticas();
-    }
-
-    obtenerTodos() {
-      return this.libros;
-    }
-
-    obtenerPorCategoria(categoria) {
-      if (categoria === 'Todas') return this.libros;
-      return this.libros.filter(l => l.categoria === categoria);
-    }
-
-    obtenerCategorias() {
-      const cats = new Set(this.libros.map(l => l.categoria));
-      return ['Todas', ...Array.from(cats).sort()];
-    }
-
-    actualizarEstadisticas() {
-      const stats = document.getElementById('stats');
-      if (stats) {
-        const totalContenido = this.libros.filter(l => l.contenido && l.contenido.length > 50).length;
-        stats.innerHTML = `📚 ${this.libros.length} libros<br>📖 ${totalContenido} con contenido completo<br>⭐ ${this.libros.length * 5} lecturas estimadas`;
-      }
+    } catch (error) {
+      console.error("Error al cargar datos:", error);
     }
   }
+
+  async agregarLibro(titulo, autor, descripcion, contenido, portada, categoria) {
+    const nuevoLibro = { titulo, autor, descripcion, contenido, portada, categoria };
+    await fetch('api_libros.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(nuevoLibro)
+    });
+    await this.cargarDesdeServidor();
+  }
+
+  async eliminarLibro(id) {
+    if (confirm('¿Estás seguro de que quieres eliminar este libro?')) {
+      await fetch(`api_libros.php?id=${id}`, { method: 'DELETE' });
+      await this.cargarDesdeServidor();
+    }
+  }
+
+  // --- ESTAS FUNCIONES SE MANTIENEN DEL ORIGINAL ---
+
+  eliminarTodos() {
+    // Si quieres que esto también borre en la BD, deberías crear un endpoint en PHP
+    // Por ahora, si solo quieres limpiar la vista:
+    this.libros = [];
+    showBooks();
+  }
+
+  obtenerTodos() {
+    return this.libros;
+  }
+
+  obtenerPorCategoria(categoria) {
+    if (categoria === 'Todas') return this.libros;
+    return this.libros.filter(l => l.categoria === categoria);
+  }
+
+  obtenerCategorias() {
+    const cats = new Set(this.libros.map(l => l.categoria));
+    return ['Todas', ...Array.from(cats).sort()];
+  }
+
+  actualizarEstadisticas() {
+    const stats = document.getElementById('stats');
+    if (stats) {
+      const totalContenido = this.libros.filter(l => l.contenido && l.contenido.length > 50).length;
+      stats.innerHTML = `📚 ${this.libros.length} libros<br>📖 ${totalContenido} con contenido completo<br>⭐ ${this.libros.length * 5} lecturas estimadas`;
+    }
+  }
+}
 
   // Función para generar colores aleatorios pero consistentes por ID
   function getColorClass(id) {
