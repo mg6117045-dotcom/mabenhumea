@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Asegúrate de incluir tu archivo de conexión real aquí
-include 'conexion.php'; 
+include 'db.php'; 
 
 // Verificamos que el usuario tenga sesión iniciada
 if (!isset($_SESSION['id'])) {
