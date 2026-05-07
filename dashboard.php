@@ -213,10 +213,10 @@ if (!isset($_SESSION['id'])) {
         </div>
         <hr>
         <div>
-          <h6><i class="bi bi-journal-bookmark-fill"></i> Préstamos</h6>
-          <div id="prestamos-list"></div>
+          <button class="btn btn-sm btn-danger w-100" onclick="eliminarTodosLosLibros()">
+            <i class="bi bi-trash"></i> Eliminar todos los libros
+          </button>
         </div>
-        <!-- Botón de eliminar todos eliminado -->
       </div>
     </aside>
 
@@ -266,9 +266,8 @@ if (!isset($_SESSION['id'])) {
   class BibliotecaVirtual {
     constructor() {
       this.libros = [];
-      this.prestamos = [];
       this.cargarDesdeLocalStorage();
-      // Si no hay libros, inicializar con datos vacíos
+      // Si no hay libros, inicializar con datos vacíos (sin ejemplos predefinidos)
       if (this.libros.length === 0) {
         this.libros = [];
         this.guardarEnLocalStorage();
@@ -277,7 +276,6 @@ if (!isset($_SESSION['id'])) {
 
     guardarEnLocalStorage() {
       localStorage.setItem('biblioteca_libros', JSON.stringify(this.libros));
-      localStorage.setItem('biblioteca_prestamos', JSON.stringify(this.prestamos));
     }
 
     cargarDesdeLocalStorage() {
@@ -292,20 +290,8 @@ if (!isset($_SESSION['id'])) {
         }
       } else {
         this.libros = [];
+        this.guardarEnLocalStorage();
       }
-      
-      const prestamosGuardados = localStorage.getItem('biblioteca_prestamos');
-      if (prestamosGuardados) {
-        try {
-          this.prestamos = JSON.parse(prestamosGuardados);
-        } catch(e) {
-          console.error("Error al cargar préstamos:", e);
-          this.prestamos = [];
-        }
-      } else {
-        this.prestamos = [];
-      }
-      
       this.actualizarEstadisticas();
     }
 
@@ -320,8 +306,12 @@ if (!isset($_SESSION['id'])) {
 
     eliminarLibro(id) {
       this.libros = this.libros.filter(l => l.id !== id);
-      // También eliminar de préstamos si estaba prestado
-      this.prestamos = this.prestamos.filter(p => p.id !== id);
+      this.guardarEnLocalStorage();
+      this.actualizarEstadisticas();
+    }
+
+    eliminarTodos() {
+      this.libros = [];
       this.guardarEnLocalStorage();
       this.actualizarEstadisticas();
     }
@@ -344,58 +334,8 @@ if (!isset($_SESSION['id'])) {
       const stats = document.getElementById('stats');
       if (stats) {
         const totalContenido = this.libros.filter(l => l.contenido && l.contenido.length > 50).length;
-        stats.innerHTML = `📚 ${this.libros.length} libros<br>📖 ${totalContenido} con contenido completo<br>⭐ ${this.libros.length * 5} lecturas estimadas<br>📋 ${this.prestamos.length} préstamos activos`;
+        stats.innerHTML = `📚 ${this.libros.length} libros<br>📖 ${totalContenido} con contenido completo<br>⭐ ${this.libros.length * 5} lecturas estimadas`;
       }
-    }
-    
-    prestarLibro(id) {
-      const libro = this.libros.find(l => l.id === id);
-      if (!libro) {
-        alert('Libro no encontrado');
-        return false;
-      }
-      
-      // Verificar si ya está prestado
-      const yaPrestado = this.prestamos.find(p => p.id === id);
-      if (yaPrestado) {
-        alert(`El libro "${libro.titulo}" ya está prestado desde ${new Date(yaPrestado.fechaPrestamo).toLocaleDateString()}`);
-        return false;
-      }
-      
-      // Agregar a préstamos
-      this.prestamos.push({
-        id: libro.id,
-        titulo: libro.titulo,
-        autor: libro.autor,
-        fechaPrestamo: new Date().toISOString()
-      });
-      
-      this.guardarEnLocalStorage();
-      this.actualizarEstadisticas();
-      alert(`✅ Libro "${libro.titulo}" prestado correctamente`);
-      return true;
-    }
-    
-    devolverLibro(id) {
-      const prestamo = this.prestamos.find(p => p.id === id);
-      if (!prestamo) {
-        alert('Este libro no está prestado');
-        return false;
-      }
-      
-      this.prestamos = this.prestamos.filter(p => p.id !== id);
-      this.guardarEnLocalStorage();
-      this.actualizarEstadisticas();
-      alert(`📚 Libro "${prestamo.titulo}" devuelto correctamente`);
-      return true;
-    }
-    
-    estaPrestado(id) {
-      return this.prestamos.some(p => p.id === id);
-    }
-    
-    obtenerPrestamos() {
-      return this.prestamos;
     }
   }
 
@@ -408,6 +348,16 @@ if (!isset($_SESSION['id'])) {
   // Inicializar biblioteca
   const biblioteca = new BibliotecaVirtual();
   let modoLuz = 'on'; // Por defecto modo claro
+
+  // Función para eliminar todos los libros
+  function eliminarTodosLosLibros() {
+    if (confirm('⚠️ ¿Estás seguro de que quieres eliminar TODOS los libros? Esta acción no se puede deshacer.')) {
+      biblioteca.eliminarTodos();
+      showBooks();
+      actualizarSidebarCategorias();
+      alert('Todos los libros han sido eliminados.');
+    }
+  }
 
   // Funciones de UI
   function showBooks() {
@@ -428,63 +378,41 @@ if (!isset($_SESSION['id'])) {
         </div>
       `;
       actualizarSidebarCategorias();
-      actualizarListaPrestamos();
       return;
     }
     
     container.innerHTML = `
       <div class="row">
-        ${libros.map(libro => {
-          const prestado = biblioteca.estaPrestado(libro.id);
-          const botonPrestamo = prestado 
-            ? `<button class="btn btn-sm btn-secondary" disabled><i class="bi bi-check-circle"></i> Prestado</button>`
-            : `<button class="btn btn-sm btn-success" onclick="event.stopPropagation(); prestarLibro(${libro.id})"><i class="bi bi-cart-plus"></i> Pedir préstamo</button>`;
-          
-          return `
-            <div class="col-md-6 col-lg-4 mb-4">
-              <div class="card book-card ${getColorClass(libro.id)} h-100" onclick="readBook(${libro.id})">
-                <img src="${libro.portada}" class="card-img-top book-cover" alt="${libro.titulo}" onerror="this.src='https://via.placeholder.com/200x250?text=Portada+no+disponible'">
-                <div class="card-body">
-                  <h5 class="card-title">${escapeHtml(libro.titulo)}</h5>
-                  <h6 class="card-subtitle mb-2">${escapeHtml(libro.autor)}</h6>
-                  <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
-                  <span class="badge">${escapeHtml(libro.categoria)}</span>
-                </div>
-                <div class="card-footer bg-transparent d-flex justify-content-between gap-2">
-                  <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); readBook(${libro.id})">
-                    <i class="bi bi-book"></i> Leer
-                  </button>
-                  ${botonPrestamo}
-                  <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); eliminarLibro(${libro.id})">
-                    <i class="bi bi-trash"></i> Eliminar
-                  </button>
-                </div>
+        ${libros.map(libro => `
+          <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card book-card ${getColorClass(libro.id)} h-100" onclick="readBook(${libro.id})">
+              <img src="${libro.portada}" class="card-img-top book-cover" alt="${libro.titulo}" onerror="this.src='https://via.placeholder.com/200x250?text=Portada+no+disponible'">
+              <div class="card-body">
+                <h5 class="card-title">${escapeHtml(libro.titulo)}</h5>
+                <h6 class="card-subtitle mb-2">${escapeHtml(libro.autor)}</h6>
+                <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
+                <span class="badge">${escapeHtml(libro.categoria)}</span>
+              </div>
+              <div class="card-footer bg-transparent d-flex justify-content-between">
+                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); readBook(${libro.id})">
+                  <i class="bi bi-book"></i> Leer
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); eliminarLibro(${libro.id})">
+                  <i class="bi bi-trash"></i> Eliminar
+                </button>
               </div>
             </div>
-          `;
-        }).join('')}
+          </div>
+        `).join('')}
       </div>
     `;
     
     actualizarSidebarCategorias();
-    actualizarListaPrestamos();
   }
 
   function eliminarLibro(id) {
     if (confirm('¿Estás seguro de que quieres eliminar este libro?')) {
       biblioteca.eliminarLibro(id);
-      showBooks();
-    }
-  }
-  
-  function prestarLibro(id) {
-    if (biblioteca.prestarLibro(id)) {
-      showBooks(); // Refrescar vista para actualizar botones
-    }
-  }
-  
-  function devolverLibro(id) {
-    if (biblioteca.devolverLibro(id)) {
       showBooks();
     }
   }
@@ -510,29 +438,6 @@ if (!isset($_SESSION['id'])) {
       }
     }
   }
-  
-  function actualizarListaPrestamos() {
-    const prestamos = biblioteca.obtenerPrestamos();
-    const container = document.getElementById('prestamos-list');
-    if (container) {
-      if (prestamos.length === 0) {
-        container.innerHTML = '<small class="text-muted">No hay préstamos activos</small>';
-      } else {
-        container.innerHTML = prestamos.map(p => `
-          <div class="d-flex justify-content-between align-items-start mb-2 border-bottom pb-2">
-            <div class="flex-grow-1">
-              <small><strong>${escapeHtml(p.titulo)}</strong></small><br>
-              <small class="text-muted">${escapeHtml(p.autor)}</small><br>
-              <small class="text-muted" style="font-size: 0.7rem;">${new Date(p.fechaPrestamo).toLocaleDateString()}</small>
-            </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="devolverLibro(${p.id})" style="font-size: 0.7rem;">
-              <i class="bi bi-arrow-return-left"></i> Dev
-            </button>
-          </div>
-        `).join('');
-      }
-    }
-  }
 
   function filtrarPorCategoria(categoria) {
     const libros = categoria === 'Todas' ? biblioteca.obtenerTodos() : biblioteca.obtenerPorCategoria(categoria);
@@ -551,39 +456,30 @@ if (!isset($_SESSION['id'])) {
       
       container.innerHTML = `
         <div class="row">
-          ${libros.map(libro => {
-            const prestado = biblioteca.estaPrestado(libro.id);
-            const botonPrestamo = prestado 
-              ? `<button class="btn btn-sm btn-secondary" disabled><i class="bi bi-check-circle"></i> Prestado</button>`
-              : `<button class="btn btn-sm btn-success" onclick="prestarLibro(${libro.id})"><i class="bi bi-cart-plus"></i> Pedir préstamo</button>`;
-            
-            return `
-              <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card book-card ${getColorClass(libro.id)} h-100">
-                  <img src="${libro.portada}" class="card-img-top book-cover" alt="${libro.titulo}" onerror="this.src='https://via.placeholder.com/200x250?text=Portada+no+disponible'">
-                  <div class="card-body">
-                    <h5 class="card-title">${escapeHtml(libro.titulo)}</h5>
-                    <h6 class="card-subtitle mb-2">${escapeHtml(libro.autor)}</h6>
-                    <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
-                    <span class="badge">${escapeHtml(libro.categoria)}</span>
-                  </div>
-                  <div class="card-footer bg-transparent d-flex justify-content-between gap-2">
-                    <button class="btn btn-sm btn-primary" onclick="readBook(${libro.id})">
-                      <i class="bi bi-book"></i> Leer
-                    </button>
-                    ${botonPrestamo}
-                    <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${libro.id})">
-                      <i class="bi bi-trash"></i> Eliminar
-                    </button>
-                  </div>
+          ${libros.map(libro => `
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card book-card ${getColorClass(libro.id)} h-100">
+                <img src="${libro.portada}" class="card-img-top book-cover" alt="${libro.titulo}" onerror="this.src='https://via.placeholder.com/200x250?text=Portada+no+disponible'">
+                <div class="card-body">
+                  <h5 class="card-title">${escapeHtml(libro.titulo)}</h5>
+                  <h6 class="card-subtitle mb-2">${escapeHtml(libro.autor)}</h6>
+                  <p class="card-text">${escapeHtml(libro.descripcion.substring(0, 100))}${libro.descripcion.length > 100 ? '...' : ''}</p>
+                  <span class="badge">${escapeHtml(libro.categoria)}</span>
+                </div>
+                <div class="card-footer bg-transparent d-flex justify-content-between">
+                  <button class="btn btn-sm btn-primary" onclick="readBook(${libro.id})">
+                    <i class="bi bi-book"></i> Leer
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${libro.id})">
+                    <i class="bi bi-trash"></i> Eliminar
+                  </button>
                 </div>
               </div>
-            `;
-          }).join('')}
+            </div>
+          `).join('')}
         </div>
       `;
     }
-    actualizarListaPrestamos();
   }
 
   function showAddBookForm() {
@@ -707,6 +603,7 @@ if (!isset($_SESSION['id'])) {
   }
 
   // Inicializar vista - SOLO UNA VEZ al cargar la página
+  // Usamos DOMContentLoaded para asegurar que no se ejecute múltiples veces
   let inicializado = false;
   
   function inicializarApp() {
@@ -719,3 +616,11 @@ if (!isset($_SESSION['id'])) {
   
   // Esperar a que el DOM esté completamente cargado
   if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarApp);
+  } else {
+    inicializarApp();
+  }
+</script>
+
+</body>
+</html>
