@@ -1,29 +1,31 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 include 'db.php';
- 
-// ✅ CORRECCIÓN: llamar la función para obtener la conexión
+
 $pdo = conectarDB();
- 
-// Verificamos que el usuario tenga sesión iniciada
+
 if (!isset($_SESSION['id'])) {
     header('Content-Type: application/json');
     echo json_encode(['error' => 'No has iniciado sesión']);
     exit;
 }
- 
+
 $id_usuario = $_SESSION['id'];
 $metodo = $_SERVER['REQUEST_METHOD'];
- 
+
 header('Content-Type: application/json');
- 
+
 switch($metodo) {
     case 'GET': 
         $stmt = $pdo->prepare("SELECT * FROM libros WHERE id_usuario = ? ORDER BY id DESC");
         $stmt->execute([$id_usuario]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
- 
+
     case 'POST': 
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
@@ -40,7 +42,7 @@ switch($metodo) {
         ]);
         echo json_encode(['success' => true]);
         break;
- 
+
     case 'DELETE':
         $id_libro = $_GET['id'];
         $stmt = $pdo->prepare("DELETE FROM libros WHERE id = ? AND id_usuario = ?");
