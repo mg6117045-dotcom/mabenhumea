@@ -1,16 +1,5 @@
 <?php
 
-// Iniciar sesión SOLO si el usuario aceptó las cookies
-if(isset($_COOKIE['cookieconsent_status']) && $_COOKIE['cookieconsent_status'] === 'allow') {
-    session_start();
-} else {
-    // Si no hay consentimiento, mostrar error y redirigir
-    header("Location: index.html?error=cookies");
-    exit;
-}
-
-
-
 // index.php
 require_once 'db.php'; // Traemos el código del otro archivo
 
