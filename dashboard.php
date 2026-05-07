@@ -347,8 +347,56 @@ if (!isset($_SESSION['id'])) {
   }
 
   // Inicializar biblioteca
-  const biblioteca = new BibliotecaVirtual();
-  let modoLuz = 'on'; // Por defecto modo claro
+// Inicializar biblioteca
+const biblioteca = new BibliotecaVirtual();
+
+// ========== INICIO: VALIDACIÓN DE AUTENTICACIÓN (como en las imágenes PHP) ==========
+// Simulación de la cookie y sesión del backend
+let userId = null;
+
+// Función para obtener cookie por nombre (como lo haría PHP)
+function getCookie(name) {
+  let value = "; " + document.cookie;
+  let parts = value.split("; " + name + "=");
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
+
+// Intentar restaurar sesión desde cookie (equivalente al código PHP)
+function validarAutenticacion() {
+  // 1) ¿Ya hay sesión activa en sessionStorage? (simula $_SESSION)
+  if (sessionStorage.getItem('id_usuario')) {
+    userId = sessionStorage.getItem('id_usuario');
+    return true;
+  }
+  
+  // 2) ¿Existe una cookie llamada "id_usuario"? (como en el tercer archivo)
+  let cookieId = getCookie("id_usuario");
+  if (cookieId !== null) {
+      // A la variable de sesión le asignamos el valor de la cookie
+      sessionStorage.setItem('id_usuario', cookieId);
+      userId = cookieId;
+      console.log("Sesión restaurada desde cookie para usuario:", userId);
+      return true;
+  }
+  
+  // No hay ni sesión ni cookie válida
+  return false;
+}
+
+// Si no está autenticado, redirigir al login.php (exterior)
+if (!validarAutenticacion()) {
+  // Redirige como haría header("Location: dashboard.php"); pero al login
+  window.location.href = "login.php";
+  // El exit() en JS se simula deteniendo la ejecución
+  throw new Error("Redirigiendo a login.php - Usuario no autenticado");
+}
+
+// Mostrar en consola que el usuario está validado (similar al dashboard)
+console.log("✅ Usuario autenticado con ID:", userId);
+// ========== FIN: VALIDACIÓN DE AUTENTICACIÓN ==========
+
+let modoLuz = 'on'; // Por defecto modo claro
 
   // Función para eliminar todos los libros
   function eliminarTodosLosLibros() {
@@ -607,14 +655,13 @@ if (!isset($_SESSION['id'])) {
   // Usamos DOMContentLoaded para asegurar que no se ejecute múltiples veces
   let inicializado = false;
   
- function inicializarApp() {
+  function inicializarApp() {
     if (inicializado) return;
     inicializado = true;
     
     cargarModoGuardado();
-    actualizarSidebarCategorias(); // Se ejecuta una sola vez al inicio
-    showBooks();                   // Se ejecuta una sola vez al inicio
-}
+    showBooks();
+  }
   
   // Esperar a que el DOM esté completamente cargado
   if (document.readyState === 'loading') {
