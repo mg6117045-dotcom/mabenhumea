@@ -250,7 +250,7 @@ if (!isset($_SESSION['id'])) {
 <script>
   // Clase Libro
   class Libro {
-    constructor(id, titulo, autor, descripcion, contenido, portada, categoria = "General",id = null) {
+    constructor(id, titulo, autor, descripcion, contenido, portada, categoria = "General") {
       this.id = id;
       this.titulo = titulo;
       this.autor = autor;
