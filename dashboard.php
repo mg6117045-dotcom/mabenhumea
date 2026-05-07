@@ -1,16 +1,4 @@
-<?php
-session_start();
-
-// ¿Existe la sesión? Si no, fuera de aquí.
-if (!isset($_SESSION['id'])) {
-    header("Location: index.html");
-    exit();
-}
-?>
-
-
-
-<!doctype html>
+Añádeselo a ese pero que quede exactamente igual nada más que los cambios que le vas a añadir sean los del código que te mostré anteriormente: <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -557,71 +545,4 @@ if (!isset($_SESSION['id'])) {
     const libro = biblioteca.libros.find(l => l.id === id);
     if (!libro) return;
     
-    document.getElementById('modalTitle').innerHTML = `<i class="bi bi-book"></i> ${escapeHtml(libro.titulo)} - ${escapeHtml(libro.autor)}`;
-    document.getElementById('modalContent').innerHTML = `
-      <div class="mb-3">
-        <div class="alert alert-info">
-          <i class="bi bi-info-circle"></i> <strong>Descripción:</strong><br>
-          ${escapeHtml(libro.descripcion)}
-        </div>
-        <div class="alert alert-secondary">
-          <i class="bi bi-tag"></i> <strong>Categoría:</strong> ${escapeHtml(libro.categoria)}<br>
-          <i class="bi bi-calendar"></i> <strong>Agregado:</strong> ${new Date(libro.fechaAgregado).toLocaleDateString()}
-        </div>
-        <hr>
-        <h5><i class="bi bi-journal-bookmark-fill"></i> Contenido:</h5>
-        <div class="p-3" style="white-space: pre-wrap;">${escapeHtml(libro.contenido || "Este libro aún no tiene contenido disponible.")}</div>
-      </div>
-    `;
-    
-    const modal = new bootstrap.Modal(document.getElementById('readModal'));
-    modal.show();
-  }
-
-  function setLightMode(mode) {
-    modoLuz = mode;
-    const body = document.body;
-    
-    if (mode === 'on') {
-      // Modo claro (luz encendida)
-      body.classList.remove('dark-mode');
-      localStorage.setItem('modoLuz', 'on');
-    } else {
-      // Modo oscuro (luz apagada)
-      body.classList.add('dark-mode');
-      localStorage.setItem('modoLuz', 'off');
-    }
-  }
-  
-  // Cargar el modo guardado al iniciar
-  function cargarModoGuardado() {
-    const modoGuardado = localStorage.getItem('modoLuz');
-    if (modoGuardado === 'off') {
-      setLightMode('off');
-    } else {
-      setLightMode('on');
-    }
-  }
-
-  // Inicializar vista - SOLO UNA VEZ al cargar la página
-  // Usamos DOMContentLoaded para asegurar que no se ejecute múltiples veces
-  let inicializado = false;
-  
-  function inicializarApp() {
-    if (inicializado) return;
-    inicializado = true;
-    
-    cargarModoGuardado();
-    showBooks();
-  }
-  
-  // Esperar a que el DOM esté completamente cargado
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', inicializarApp);
-  } else {
-    inicializarApp();
-  }
-</script>
-
-</body>
-</html>
+    document.getElementById('modalTitle').innerHTML = `<i class="bi bi-book"></i> ${escapeHtml(libro.titulo)} - ${escapeHtml(lib
