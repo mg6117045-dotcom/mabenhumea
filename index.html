@@ -7,6 +7,13 @@
     <link href="./wwwroot/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./wwwroot/css/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- ========================================== -->
+    <!-- SISTEMA DE COOKIES (Banner de consentimiento) -->
+    <!-- ========================================== -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js"></script>
+    
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -146,6 +153,33 @@
         ¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a>
       </p>
     </div>
+
+    <!-- ========================================== -->
+    <!-- ACTIVAR EL BANNER DE COOKIES -->
+    <!-- ========================================== -->
+    <script>
+    window.addEventListener("load", function(){
+        window.cookieconsent.initialise({
+            palette: {
+                popup: {
+                    background: "#18181f",
+                    text: "#f0f0f5"
+                },
+                button: {
+                    background: "#6c63ff",
+                    text: "#ffffff"
+                }
+            },
+            theme: "classic",
+            content: {
+                message: "🍪 Este sitio usa cookies para recordar tu sesión y mejorar la experiencia.",
+                dismiss: "Aceptar",
+                link: "Más información",
+                href: "/politica-cookies.html"  // 👈 CAMBIA ESTA RUTA si tu política está en otro lado
+            }
+        });
+    });
+    </script>
 
   </body>
 </html>
