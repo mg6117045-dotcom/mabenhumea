@@ -250,7 +250,7 @@ if (!isset($_SESSION['id'])) {
 <script>
   // Clase Libro
   class Libro {
-    constructor(id, titulo, autor, descripcion, contenido, portada, categoria = "General") {
+    constructor(id, titulo, autor, descripcion, contenido, portada, categoria = "General",id = null) {
       this.id = id;
       this.titulo = titulo;
       this.autor = autor;
@@ -285,13 +285,28 @@ class BibliotecaVirtual {
 
   async agregarLibro(titulo, autor, descripcion, contenido, portada, categoria) {
     const nuevoLibro = { titulo, autor, descripcion, contenido, portada, categoria };
-    await fetch('api_libros.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(nuevoLibro)
-    });
-    await this.cargarDesdeServidor();
-  }
+    
+    try {
+        const respuesta = await fetch('api_libros.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevoLibro)
+        });
+        
+        const resultado = await respuesta.json();
+        
+        if (resultado.success) {
+            await this.cargarDesdeServidor();
+            return true;
+        } else {
+            console.error("Error del servidor:", resultado.error);
+            return false;
+        }
+    } catch (error) {
+        console.error("Error en la petición fetch:", error);
+        return false;
+    }
+}
 
   async eliminarLibro(id) {
     if (confirm('¿Estás seguro de que quieres eliminar este libro?')) {
