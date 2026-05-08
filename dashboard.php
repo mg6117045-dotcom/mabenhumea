@@ -8,7 +8,7 @@ if(!isset($_COOKIE["id_usuario"])) {
     exit();
 }
 
-    }
+    
 ?>
 <!doctype html>
 <html lang="en">
