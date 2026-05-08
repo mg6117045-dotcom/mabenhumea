@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(!isset($_COOKIE["id_usuario"]) || empty($_COOKIE["id_usuario"])) {
-    header("Location: index.php");
+    header("Location: dashboard.php");
     exit();
 }
 // Opcional: cargar el id en sesión si lo necesitas
