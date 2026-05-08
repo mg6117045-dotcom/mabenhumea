@@ -1,71 +1,41 @@
 <?php
 
-// index.php
-require_once 'db.php'; // Traemos el código del otro archivo
+require_once 'db.php';
 
+$email = $_POST['email'];
+$pwd   = $_POST['pwd'];
 
+$db = conectarDB();
 
-//  Obtenemos los datos del formulario
-     $email  = $_POST['email'];
-     $pwd = $_POST['pwd'];
-     
-     // Llamamos a la función y guardamos el objeto en $db
-     $db = conectarDB();
-      
+try {
 
-  try {
+    $sql   = "SELECT id, password, email FROM usuarios WHERE email = :email";
+    $query = $db->prepare($sql);
+    $query->execute(['email' => $email]);
+    $usuario = $query->fetch(PDO::FETCH_ASSOC);
 
-
-        $sql = "select id,password,email from usuarios where email= :email";
-        $query = $db->prepare($sql);
-
-	
-
-        // Ejecutamos pasando los datos en un array
-        $resultado = $query->execute([
-            'email'  => $email
-        ]);
-        $usuario = $query->fetch(PDO::FETCH_ASSOC);
-        if($usuario){
+    if ($usuario) {
         $verify = password_verify($pwd, $usuario['password']);
-        if($verify){
+
+        if ($verify) {
             session_start();
-            $_SESSION['username'] = $usuario['email']; // Store session data
-            $_SESSION['id'] = $usuario['id'];
-          
-            $cookie_name = "id_usuario";
-            $cookie_value = $usuario['id_usuario'];
-            $expiry = time() + (86400 * 30); // Valid for 30 days
-            setcookie($cookie_name, $cookie_value, $expiry, "/");
-            
+            $_SESSION['username'] = $usuario['email'];
+            $_SESSION['id']       = $usuario['id'];
+
+            setcookie("id_usuario", $usuario['id'], time() + (86400 * 30), "/");
+
             header("Location: dashboard.php");
-            
-        }else{
-            echo "La contraseña esta mal...";
-        }
-        
-        
-        }else{
-            echo "No se encontraron datos!";
+            exit; // Solo una vez, nada después de aquí
+
+        } else {
+            echo "La contraseña está mal...";
         }
 
-        
-
-        
-
-        
-
-    } catch (PDOException $e) {
-        // Manejo de errores (ej. si el email ya existe y es único)
-        echo "Database Error: " . $e->getMessage();
-
-        
-     
+    } else {
+        echo "No se encontraron datos!";
     }
 
-
-
-
-
-
+} catch (PDOException $e) {
+    echo "Database Error: " . $e->getMessage();
+}
 ?>
