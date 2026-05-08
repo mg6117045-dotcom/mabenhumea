@@ -1,9 +1,8 @@
 <?php
 session_start();
-
-// ¿Existe la sesión? Si no, fuera de aquí.
-if (!isset($_SESSION['id'])) {
-    header("Location: index.html");
+if(!isset($_COOKIE["id_usuario"])) {
+    $_SESSION['id_usuario'] = $_COOKIE["id_usuario"];
+    header("Location: index.php");
     exit();
 }
 ?>
