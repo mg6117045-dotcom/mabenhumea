@@ -4,7 +4,7 @@ session_start();
 
 if(!isset($_COOKIE["id_usuario"])) {
     $_SESSION['id_usuario'] = $_COOKIE["id_usuario"];
-    header("Location: index.php");
+    header("Location: dashboard.php");
     exit();
 }
 
