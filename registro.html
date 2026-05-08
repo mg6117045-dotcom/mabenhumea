@@ -3,14 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Biblioteca — Iniciar sesión</title>
+    <title>Biblioteca — Registro</title>
+    <link href="./wwwroot/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./wwwroot/css/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
       body {
         min-height: 100vh;
-        background: #ebebef;
+        background: #dedee3;
         font-family: 'DM Sans', sans-serif;
         display: flex;
         align-items: center;
@@ -19,8 +21,8 @@
       }
 
       .dk-card {
-        background: #f4f4fa;
-        border: 1px solid #e9e9f6;
+        background: #eeeef5;
+        border: 1px solid #2a2a35;
         border-radius: 14px;
         padding: 2.5rem 2.2rem 2rem;
         width: 100%;
@@ -41,14 +43,14 @@
         font-family: 'Syne', sans-serif;
         font-size: 26px;
         font-weight: 700;
-        color: #1a1a2e;
+        color: #070708;
         text-align: center;
         margin-bottom: 4px;
       }
 
       .dk-sub {
         font-size: 13px;
-        color: #6b6b80;
+        color: #0976dc;
         text-align: center;
         margin-bottom: 1.8rem;
         font-weight: 300;
@@ -56,14 +58,14 @@
 
       .dk-line {
         height: 1px;
-        background: #e0e0ee;
+        background: #2a2a35;
         margin-bottom: 1.6rem;
       }
 
       .dk-label {
         font-size: 11px;
-        font-weight: 600;
-        color: #4a4a6a;
+        font-weight: 500;
+        color: #8888a0;
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-bottom: 6px;
@@ -72,24 +74,20 @@
 
       .dk-input {
         width: 100%;
-        background: #ffffff;
-        border: 1px solid #d8d8ee;
+        background: #0f0f13;
+        border: 1px solid #2a2a35;
         border-radius: 8px;
         padding: 11px 14px;
         font-size: 14px;
         font-family: 'DM Sans', sans-serif;
-        color: #1a1a2e;
+        color: #f0f0f5;
         margin-bottom: 18px;
         outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
+        transition: border-color 0.2s;
       }
 
-      .dk-input:focus {
-        border-color: #6c63ff;
-        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
-      }
-
-      .dk-input::placeholder { color: #b0b0c8; }
+      .dk-input:focus { border-color: #6c63ff; }
+      .dk-input::placeholder { color: #3a3a50; }
 
       .dk-btn {
         width: 100%;
@@ -106,10 +104,6 @@
         cursor: pointer;
         margin-top: 4px;
         transition: background 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
       }
 
       .dk-btn:hover { background: #5549e0; }
@@ -128,41 +122,31 @@
       }
 
       .dk-footer a:hover { text-decoration: underline; }
-
-      .dk-error {
-        background: #fff0f0;
-        border: 1px solid #ffcccc;
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 13px;
-        color: #cc3333;
-        margin-bottom: 16px;
-        display: none;
-      }
     </style>
   </head>
   <body>
 
     <div class="dk-card">
       <p class="dk-tag">◆ Biblioteca</p>
-      <h1 class="dk-title">Bienvenido</h1>
-      <p class="dk-sub">Accede a tu cuenta de lector</p>
+      <h1 class="dk-title">Crear cuenta</h1>
+      <p class="dk-sub">Únete a la comunidad lectora</p>
       <div class="dk-line"></div>
 
-      <form method="POST" action="index.php">
+      <form method="POST" action="usuarios.php">
+        <label class="dk-label" for="nombre">Nombre completo</label>
+        <input class="dk-input" type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" required>
+
         <label class="dk-label" for="email">Correo electrónico</label>
         <input class="dk-input" type="email" id="email" name="email" placeholder="tu@correo.com" required>
 
         <label class="dk-label" for="pwd">Contraseña</label>
         <input class="dk-input" type="password" id="pwd" name="pwd" placeholder="••••••••" required>
 
-        <button class="dk-btn" type="submit">
-          ⇨ Iniciar sesión
-        </button>
+        <button class="dk-btn" type="submit">Registrarse</button>
       </form>
 
       <p class="dk-footer">
-        ¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a>
+        ¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a>
       </p>
     </div>
 
