@@ -1,11 +1,12 @@
 <?php
 session_start();
-if(!isset($_COOKIE["id_usuario"])) {
-    $_SESSION['id_usuario'] = $_COOKIE["id_usuario"];
+if(!isset($_COOKIE["id_usuario"]) || empty($_COOKIE["id_usuario"])) {
     header("Location: index.php");
     exit();
 }
-?>
+// Opcional: cargar el id en sesión si lo necesitas
+$_SESSION['id_usuario'] = $_COOKIE["id_usuario"];
+
 
 
 <!doctype html>
