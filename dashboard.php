@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(!isset($_COOKIE["id_usuario"]) || empty($_COOKIE["id_usuario"])) {
-    header("Location: dashboard.php");
+    header("Location: index.php");
     exit();
 }
 // Opcional: cargar el id en sesión si lo necesitas
@@ -639,3 +639,4 @@ newForm.addEventListener('submit', async function(e) {
 
 </body>
 </html>
+
