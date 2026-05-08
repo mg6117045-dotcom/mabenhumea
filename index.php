@@ -13,7 +13,7 @@
 
       body {
         min-height: 100vh;
-        background: #0f0f13;
+        background: #eeeef3;
         font-family: 'DM Sans', sans-serif;
         display: flex;
         align-items: center;
@@ -23,8 +23,8 @@
       }
 
       .dk-card {
-        background: #18181f;
-        border: 1px solid #2a2a35;
+        background: #d4d4db;
+        border: 1px solid #e3e3ef;
         border-radius: 14px;
         padding: 2.5rem 2.2rem 2rem;
         width: 100%;
@@ -36,7 +36,7 @@
         font-weight: 700;
         letter-spacing: 2px;
         text-transform: uppercase;
-        color: #6c63ff;
+        color: #58547e;
         text-align: center;
         margin-bottom: 10px;
       }
@@ -45,7 +45,7 @@
         font-family: 'Syne', sans-serif;
         font-size: 26px;
         font-weight: 700;
-        color: #f0f0f5;
+        color: #090909;
         text-align: center;
         margin-bottom: 4px;
       }
@@ -77,7 +77,7 @@
       .dk-input {
         width: 100%;
         background: #0f0f13;
-        border: 1px solid #2a2a35;
+        border: 1px solid #bbbbcc;
         border-radius: 8px;
         padding: 11px 14px;
         font-size: 14px;
