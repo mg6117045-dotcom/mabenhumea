@@ -19,13 +19,18 @@ try {
 
         if ($verify) {
             session_start();
-            $_SESSION['username'] = $usuario['email'];
-            $_SESSION['id']       = $usuario['id'];
+           $_SESSION['id_usuario'] = $usuario['id_usuario'];
+    $cookie_name = "id_usuario";
+    $cookie_value = $usuario['id_usuario'];
+    $expiry = time() + (86400 * 30); // Valid for 30 days
+    setcookie($cookie_name, $cookie_value, $expiry, "/");
 
-            setcookie("id_usuario", $usuario['id'], time() + (86400 * 30), "/");
 
             header("Location: dashboard.php");
             exit; // Solo una vez, nada después de aquí
+
+
+
 
         } else {
             echo "La contraseña está mal...";
