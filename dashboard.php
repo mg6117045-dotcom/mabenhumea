@@ -7,6 +7,7 @@ if(!isset($_COOKIE["id_usuario"]) || empty($_COOKIE["id_usuario"])) {
 // Opcional: cargar el id en sesión si lo necesitas
 $_SESSION['id_usuario'] = $_COOKIE["id_usuario"];
 
+?>
 
 
 <!doctype html>
