@@ -61,6 +61,21 @@ try {
     </header>
 
     <div class="container-fluid mt-4">
+
+        <div class="row mb-3">
+    <div class="col-12">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLibro">
+            <i class="bi bi-book"></i> Nuevo Libro
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalAutor">
+            <i class="bi bi-person-plus"></i> Nuevo Autor
+        </button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPrestamo">
+            <i class="bi bi-calendar-plus"></i> Solicitar Préstamo
+        </button>
+    </div>
+</div>
+
         <div class="row">
             <div class="col-12 col-xl-7 mb-4">
                 <div class="card shadow-sm">
@@ -147,19 +162,102 @@ try {
         </div>
     </div>
 
-    </div> <div class="modal fade" id="modalLibro" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Nuevo Libro</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
+    <div class="modal fade" id="modalLibro" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-book"></i> Registrar Nuevo Libro</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="agregar_libro.php" method="POST">
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input type="text" name="titulo" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">ISBN</label>
+                <input type="text" name="isbn" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Año de Publicación</label>
+                <input type="number" name="anio" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Seleccionar Autor</label>
+                <select name="id_autor" class="form-select" required>
+                    <?php
+                    $listaAutores = $db->query("SELECT * FROM autores")->fetchAll();
+                    foreach($listaAutores as $aut) {
+                        echo "<option value='{$aut['id']}'>{$aut['nombre']}</option>";
+                    }
+                    ?>
+                </select>
             </div>
         </div>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-primary">Guardar Libro</button>
+        </div>
+      </form>
     </div>
+  </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div class="modal fade" id="modalAutor" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-plus"></i> Registrar Autor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="agregar_autor.php" method="POST">
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Nombre del Autor</label>
+                <input type="text" name="nombre_autor" class="form-control" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-secondary">Guardar Autor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalPrestamo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-calendar-plus"></i> Solicitar Préstamo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="registrar_prestamo.php" method="POST">
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Libro a solicitar</label>
+                <select name="id_libro" class="form-select" required>
+                    <?php foreach($libros as $lib): ?>
+                        <option value="<?php echo $lib['id']; ?>"><?php echo $lib['titulo']; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Fecha de Devolución</label>
+                <input type="date" name="fecha_devolucion" class="form-control" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-success">Confirmar Préstamo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
