@@ -148,16 +148,19 @@ try {
                     </div>
                 </div>
                 
-                <div class="card mt-3" id="simulador-box" style="transition: background-color 0.3s ease;">
-    <div class="card-body text-center">
-        <h6 id="simulador-titulo">modo oscuro</h6>
-        <img id="lightbulb" src="./wwwroot/img/bulboff.gif" class="img-fluid mb-2" style="max-height: 100px;">
-        <div>
-            <button class="btn btn-sm btn-warning" onclick="encenderModoLectura()">Encender</button>
-            <button class="btn btn-sm btn-outline-secondary" onclick="apagarModoLectura()">Apagar</button>
+                <div class="card mt-3">
+                    <div class="card-body text-center">
+                        <h6>Simulador de Lectura</h6>
+                        <img id="lightbulb" src="./wwwroot/img/bulboff.gif" class="img-fluid mb-2" style="max-height: 100px;">
+                        <div>
+                            <button class="btn btn-sm btn-outline-warning" onclick="document.getElementById('lightbulb').src='./wwwroot/img/bulbon.gif'">Encender</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('lightbulb').src='./wwwroot/img/bulboff.gif'">Apagar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
     <div class="modal fade" id="modalLibro" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
@@ -255,35 +258,6 @@ try {
   </div>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        function encenderModoLectura() {
-            // Cambia la imagen
-            document.getElementById('lightbulb').src = './wwwroot/img/bulbon.gif';
-            
-            // Cambia el fondo de la tarjeta a modo oscuro
-            const caja = document.getElementById('simulador-box');
-            caja.style.backgroundColor = '#1e1e2f'; // Un azul oscuro elegante
-            caja.style.borderColor = '#3d3d5c';
-            
-            // Cambia el color del título a blanco
-            document.getElementById('simulador-titulo').style.color = '#ffffff';
-        }
-
-        function apagarModoLectura() {
-            // Cambia la imagen
-            document.getElementById('lightbulb').src = './wwwroot/img/bulboff.gif';
-            
-            // Regresa el fondo a blanco (predeterminado)
-            const caja = document.getElementById('simulador-box');
-            caja.style.backgroundColor = '#ffffff';
-            caja.style.borderColor = 'rgba(0,0,0,.175)';
-            
-            // Regresa el título a color oscuro
-            document.getElementById('simulador-titulo').style.color = '#212529';
-        }
-    </script>
-</body>
+  </body>
 </html>
