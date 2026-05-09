@@ -98,7 +98,7 @@ if(!isset($_SESSION['id_usuario']) && isset($_COOKIE["id_usuario"])) {
     
 
 
-    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./wwwroot/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
 
