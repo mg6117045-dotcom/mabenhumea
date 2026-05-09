@@ -1,14 +1,16 @@
 <?php
 session_start();
 
-
-if(!isset($_COOKIE["id_usuario"])) {
-    $_SESSION['id_usuario'] = $_COOKIE["id_usuario"];
-    header("Location: dashboard.php");
+// Si no existe la sesión Y no existe la cookie, devuélvelo al login
+if(!isset($_SESSION['id_usuario']) && !isset($_COOKIE["id_usuario"])) {
+    header("Location: index.php");
     exit();
 }
 
-    
+// Si existe la cookie pero no la sesión (ej. cerró el navegador), restauramos la sesión
+if(!isset($_SESSION['id_usuario']) && isset($_COOKIE["id_usuario"])) {
+    $_SESSION['id_usuario'] = $_COOKIE["id_usuario"];
+}
 ?>
 <!doctype html>
 <html lang="en">
