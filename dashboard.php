@@ -18,7 +18,7 @@ $id_actual = $_SESSION['id_usuario'];
 
 try {
     // 2. CONSULTA DE LIBROS Y AUTORES
-    $sqlLibros = "SELECT l.id, l.titulo, l.isbn, l.anio_publicacion, a.nombre AS autor 
+    $sqlLibros = "SELECT l.id, l.titulo, l.categoria, l.anio_publicacion, a.nombre AS autor 
                   FROM libros l 
                   INNER JOIN autores a ON l.id_autor = a.id";
     $libros = $db->query($sqlLibros)->fetchAll();
@@ -90,7 +90,7 @@ try {
                                         <th>Título</th>
                                         <th>Autor</th>
                                         <th>Año</th>
-                                        <th>ISBN</th>
+                                        <th>Categoria</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -99,7 +99,7 @@ try {
                                         <td><strong><?php echo $l['titulo']; ?></strong></td>
                                         <td><?php echo $l['autor']; ?></td>
                                         <td><?php echo $l['anio_publicacion']; ?></td>
-                                        <td><small class="text-muted"><?php echo $l['isbn']; ?></small></td>
+                                        <td><small class="text-muted"><?php echo $l['categoria']; ?></small></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -176,8 +176,8 @@ try {
                 <input type="text" name="titulo" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">ISBN</label>
-                <input type="text" name="isbn" class="form-control">
+                <label class="form-label">Categoria</label>
+                <input type="text" name="categoria" class="form-control">
             </div>
             <div class="mb-3">
                 <label class="form-label">Año de Publicación</label>
