@@ -152,6 +152,11 @@ try {
     <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalAutor"> + Nuevo Autor </button>
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPrestamo"> + Nuevo Préstamo </button>
 </div>
+    <script src="./wwwroot/js/jquery-4.0.0.min.js"></script>
+    
     <script src="./wwwroot/js/bootstrap.bundle.min.js"></script>
+    
+  </body>
+</html>
 </body>
 </html>
