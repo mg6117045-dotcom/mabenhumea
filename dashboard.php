@@ -147,6 +147,11 @@ try {
         </div>
     </div>
 
+    <div class="mb-3">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLibro"> + Nuevo Libro </button>
+    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalAutor"> + Nuevo Autor </button>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPrestamo"> + Nuevo Préstamo </button>
+</div>
     <script src="./wwwroot/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
