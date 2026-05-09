@@ -44,7 +44,7 @@ try {
     <title>Dashboard - Biblioteca</title>
     <link href="./wwwroot/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./wwwroot/css/bootstrap-icons.min.css">
-    <script src="./wwwroot/js/jquery-4.0.0.min.js"></script>
+  
 </head>
 <body>
     <header class="px-3 py-2 text-bg-primary border-bottom">
@@ -147,16 +147,19 @@ try {
         </div>
     </div>
 
-    <div class="mb-3">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLibro"> + Nuevo Libro </button>
-    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalAutor"> + Nuevo Autor </button>
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPrestamo"> + Nuevo Préstamo </button>
-</div>
-    <script src="./wwwroot/js/jquery-4.0.0.min.js"></script>
-    
-    <script src="./wwwroot/js/bootstrap.bundle.min.js"></script>
-    
+    </div> <div class="modal fade" id="modalLibro" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Nuevo Libro</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
-</html>
-</body>
 </html>
